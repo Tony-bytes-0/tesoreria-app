@@ -26,7 +26,7 @@ const deleteItem = (targetId) => {
         <v-row dense class="mt-20 ml-20 mr-20">
             <v-col md="12">
                 <v-card
-                    class="mx-auto p-6 justify-center text-center"
+                    class="mx-auto p-6 justify-center text-center mb-4"
                     title="Registrar orden de pago"
                     variant="outlined"
                 >

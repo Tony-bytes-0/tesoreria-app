@@ -1,7 +1,7 @@
 <template>
     <!-- <v-chip class="ma-2" label> Datos de la cuenta </v-chip> -->
-    <v-divider :thickness="7" class="mb-2">Datos de la cuenta</v-divider>
-    <v-row>
+    <v-divider :thickness="7">Datos de la cuenta</v-divider>
+    <v-row class="m-2">
         <v-col cols="3">
             <v-select
                 v-model="accountDetails.empresa"
@@ -38,13 +38,19 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
 var accountDetails = ref({
     empresa: "",
     numeroDeCuenta: "",
     tipoDeCuenta: "",
     numeroDeRegistro: "",
+});
+onMounted(async () => {
+    console.log("componente montado");
+    fetch("http://localhost:8000/api/consultar_cuentas_bancarias")
+        .then((response) => response.json())
+        .then((data) => console.log(data));
 });
 </script>
 
