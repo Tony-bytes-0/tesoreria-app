@@ -6,7 +6,7 @@ import TableheadThs from "@/Components/ordenes de pago/TableheadThs.vue";
 import Navbar from "@/Layouts/Navbar.vue";
 import { ref, defineProps } from "vue";
 
-const props = defineProps(['cuentasBancarias'])
+const props = defineProps(['cuentasNaviarca', 'cuentasGc'])
 var items = ref([]);
 var idCounter = ref(0);
 
@@ -36,7 +36,7 @@ const deleteItem = (targetId) => {
             </v-col>
         </v-row>
 
-        <AccountSelect :cuentasBancarias="props.cuentasBancarias" />
+        <AccountSelect :cuentasNaviarca="props.cuentasNaviarca" :cuentasGc="props.cuentasGc" />
         <Formulario @addToList="addToList"  />
 <!--         <h1>props!!!!!!!!!!!!: {{ props.cuentasBancarias }}</h1> -->
         <v-table height="300px" fixed-header>

@@ -35,14 +35,14 @@
             ></v-text-field>
         </v-col>
     </v-row>
-    <h1> PROPS: {{ props.cuentasBancarias }} </h1>
+    <h1> PROPS: {{ props.cuentasNaviarca }} </h1>
 </template>
 
 <script setup>
 
 import { ref } from "vue";
 
-const props = defineProps(['cuentasBancarias'])
+const props = defineProps(['cuentasNaviarca', 'cuentasGc'])
 
 var accountDetails = ref({
     empresa: "",
