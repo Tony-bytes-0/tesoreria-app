@@ -35,10 +35,14 @@
             ></v-text-field>
         </v-col>
     </v-row>
+    <h1> PROPS: {{ props.cuentasBancarias }} </h1>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+
+import { ref } from "vue";
+
+const props = defineProps(['cuentasBancarias'])
 
 var accountDetails = ref({
     empresa: "",
@@ -46,12 +50,7 @@ var accountDetails = ref({
     tipoDeCuenta: "",
     numeroDeRegistro: "",
 });
-onMounted(async () => {
-    console.log("componente montado");
-    fetch("http://localhost:8000/api/consultar_cuentas_bancarias")
-        .then((response) => response.json())
-        .then((data) => console.log(data));
-});
+
 </script>
 
 <style scooped>

@@ -4,8 +4,9 @@ import Formulario from "@/Components/ordenes de pago/Formulario.vue";
 import ItemOnList from "@/Components/ordenes de pago/ItemOnList.vue";
 import TableheadThs from "@/Components/ordenes de pago/TableheadThs.vue";
 import Navbar from "@/Layouts/Navbar.vue";
-import { ref } from "vue";
+import { ref, defineProps } from "vue";
 
+const props = defineProps(['cuentasBancarias'])
 var items = ref([]);
 var idCounter = ref(0);
 
@@ -22,6 +23,7 @@ const deleteItem = (targetId) => {
 
 <template>
     <!-- <Navbar /> -->
+     
     <Navbar>
         <v-row dense class="mt-20 ml-20 mr-20">
             <v-col md="12">
@@ -34,10 +36,9 @@ const deleteItem = (targetId) => {
             </v-col>
         </v-row>
 
-        <AccountSelect />
-        <!-- <FormularioOPE /> -->
-        <Formulario @addToList="addToList" />
-
+        <AccountSelect :cuentasBancarias="props.cuentasBancarias" />
+        <Formulario @addToList="addToList"  />
+<!--         <h1>props!!!!!!!!!!!!: {{ props.cuentasBancarias }}</h1> -->
         <v-table height="300px" fixed-header>
             <thead>
                 <tr>
