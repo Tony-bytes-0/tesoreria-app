@@ -3,14 +3,6 @@
     <v-divider :thickness="7">Datos de la orden </v-divider>
     <v-form class="p-2" @submit.prevent>
         <v-row>
-            <v-col cols="12">
-                <v-text-field
-                    v-model="props.form"
-                    :items="['Proveedores', 'Electronico']"
-                    label="prueba"
-                >
-                </v-text-field>
-            </v-col>
             <v-col cols="2">
                 <v-select
                     v-model="ordenDePagoElectronico.tipoDeOrden"
@@ -112,6 +104,7 @@
                 <v-btn
                     class="w-2/5 justify-center items-center m-2"
                     color="success"
+                    @click="submit"
                 >
                     Procesar
                 </v-btn>
@@ -119,19 +112,18 @@
 
             <v-col cols="3"></v-col>
         </v-row>
-        <v-btn type="submit">example submit</v-btn>
     </v-form>
 </template>
 <script setup>
-import { reactive, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import "vuetify/styles";
 import "vuetify";
 import { staticError } from "../alerts/staticMessages";
 
-const emit = defineEmits(["addToList"]);
+const emit = defineEmits(["addToList", "submit"]);
 const props = defineProps(["form"]);
 
-var ordenDePagoElectronico = reactive({
+var ordenDePagoElectronico = ref({
     tipoDeOrden: "",
     referencia: "",
     nombreDelBeneficiario: "",
@@ -155,7 +147,7 @@ const validateForm = (item) => {
 };
 
 const resetForm = () => {
-    ordenDePagoElectronico = {
+    ordenDePagoElectronico.value = {
         tipoDeOrden: "",
         referencia: "",
         nombreDelBeneficiario: "",
@@ -170,15 +162,17 @@ const resetForm = () => {
     };
 };
 const handleAddToList = () => {
-    if (validateForm(ordenDePagoElectronico)) {
+    if (validateForm(ordenDePagoElectronico.value)) {
         staticError("Complete el formulario");
     } else {
-        emit("addToList", ordenDePagoElectronico);
+        emit("addToList", ordenDePagoElectronico.value);
         resetForm();
     }
-
-    //reiniciar lista
 };
+
+const submit = () => {
+    emit('submit')
+}
 </script>
 
 <style scooped>

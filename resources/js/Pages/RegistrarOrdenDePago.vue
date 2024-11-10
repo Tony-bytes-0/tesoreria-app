@@ -11,8 +11,6 @@ const props = defineProps(["cuentasNaviarca", "cuentasGc"]);
 var items = ref([]); //items del formulario
 var idCounter = ref(0);
 
-
-
 const addToList = (newItem) => {
     newItem = { ...newItem, id: idCounter.value++ };
         items.value.push(newItem);
@@ -54,6 +52,10 @@ const accProps = (item) => {
 const onSwitchClick = () => {
     selectedAccount.value = "";
 };
+// form submit, enviar, procesar
+const submit = () => {
+    console.log('data a enviar: ', items.value, ' cuenta bancaria: ', selectedAccount.value)
+}
 </script>
 
 <template>
@@ -99,7 +101,7 @@ const onSwitchClick = () => {
             </v-col>
             <!-- <v-col cols="2"></v-col> -->
         </v-row>
-        <Formulario @addToList="addToList" />
+        <Formulario @addToList="addToList" @submit="submit" />
 
         <v-table height="300px" fixed-header>
             <thead>
