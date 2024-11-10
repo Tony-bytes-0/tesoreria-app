@@ -19,7 +19,7 @@
             density="comfortable"
             @click="handleDeleteItem(item.id)"
         >
-            <svg-icon type="mdi" :path="deleteIconPath" class=" bg-red-500"></svg-icon>
+            <svg-icon type="mdi" :path="deleteIconPath" ></svg-icon>
         </v-btn>
     </td>
 </template>

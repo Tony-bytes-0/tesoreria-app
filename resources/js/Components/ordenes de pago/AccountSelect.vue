@@ -2,85 +2,41 @@
     <!-- <v-chip class="ma-2" label> Datos de la cuenta </v-chip> -->
     <v-divider :thickness="7">Datos de la cuenta</v-divider>
     <v-row class="m-2">
-        <v-col cols="6">
-            <!--             <v-select
-                v-model="selectedAccount"
-                :items="props.cuentasNaviarca.original"
-                label="Seleccione una cuenta"
-                item-title="222"
-            >
-            </v-select> -->
+        <!-- <v-col cols="2"></v-col> -->
+        <v-col cols="3">
+            <v-switch
+                v-model="company"
+                :label="`Empresa: ${company}`"
+                false-value="Gran cacique"
+                true-value="Naviarca"
+                hide-details
+                @click="onSwitchClick"
+            ></v-switch>
+        </v-col>
+        <v-col cols="9">
             <v-select
                 v-model="selectedAccount"
-                :items="props.cuentasNaviarca.original"
-                item-title="banco_nombre"
-                item-value="codigo_cuenta"
-                label="cuentas bancarias"
-                return-object
-                single-line
+                :items="
+                    company == 'Naviarca'
+                        ? props.cuentasNaviarca.original
+                        : props.cuentasGc.original
+                "
+                :item-props="accProps"
+                label="Cuenta bancaria"
             ></v-select>
         </v-col>
+        <!-- <v-col cols="2"></v-col> -->
     </v-row>
-    <v-row class="m-2">
-        <v-col cols="3">
-            <v-select
-                v-model="accountDetails.empresa"
-                :items="['Naviarca', 'Gran Cacique']"
-                label="Empresa"
-            >
-            </v-select>
-        </v-col>
-        <v-col cols="3">
-            <v-text-field
-                class="custom-dark"
-                v-model="accountDetails.numeroDeCuenta"
-                :counter="10"
-                label="Numero de cuenta"
-            ></v-text-field>
-        </v-col>
-        <v-col cols="3">
-            <v-select
-                v-model="accountDetails.empresa"
-                :items="['Naviarca', 'Gran Cacique']"
-                label="Tipo de cuenta"
-            >
-            </v-select>
-        </v-col>
-        <v-col cols="3">
-            <v-text-field
-                class="custom-dark"
-                v-model="accountDetails.numeroDeCuenta"
-                :counter="10"
-                label="Numero de cuenta"
-            ></v-text-field>
-        </v-col>
-    </v-row>
-    <h1>
-        PROPS:
-        {{
-            (props.cuentasNaviarca.original,
-            "tipo: ",
-            typeof props.cuentasNaviarca)
-        }}
-    </h1>
-    {{ props.cuentasNaviarca }}
+    <!-- {{ props.cuentasNaviarca }} -->
 </template>
 
 <script setup>
 import { ref } from "vue";
-import ItemOnList from "./ItemOnList.vue";
 import "vuetify/styles";
 import "vuetify";
-
 const props = defineProps(["cuentasNaviarca", "cuentasGc"]);
 
-var accountDetails = ref({
-    empresa: "",
-    numeroDeCuenta: "",
-    tipoDeCuenta: "",
-    numeroDeRegistro: "",
-});
-
+var company = ref('Naviarca');
 var selectedAccount = ref({
     banco_id: "",
     codigo_cuenta: "",
@@ -89,15 +45,30 @@ var selectedAccount = ref({
     banco_nombre: "",
 });
 
-const formatItemText = (item) => {
-    return "example";
+const accProps = (item) => {
+    return {
+        title: item.banco_nombre, // + " - " + item.codigo_cuenta,
+        subtitle:
+            item.banco_id +
+            " - " +
+            item.tipo_cuenta +
+            " - " +
+            item.codigo_cuenta,
+        value: {
+            id: item.id,
+            banco_id: item.banco_id,
+            codigo_cuenta: item.codigo_cuenta,
+            moneda_id: item.moneda_id,
+            tipo_cuenta: item.tipo_cuenta,
+            banco_nombre: item.banco_nombre,
+        },
+    };
 };
 
-const formatItemValue = (item) => {
-    return item.codigo_cuenta.toString();
+const onSwitchClick = () => {
+    selectedAccount.value = ''
 };
 
-const makeNewIterableList = (arrayWithObjects) => {};
 </script>
 
 <style scooped>

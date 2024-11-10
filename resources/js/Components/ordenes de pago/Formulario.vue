@@ -1,8 +1,16 @@
 <template>
-        <!-- <v-chip class="ma-2" label> Datos de la orden </v-chip> -->
+    <!-- <v-chip class="ma-2" label> Datos de la orden </v-chip> -->
     <v-divider :thickness="7">Datos de la orden </v-divider>
-    <v-form class="p-2">
+    <v-form class="p-2" @submit.prevent>
         <v-row>
+            <v-col cols="12">
+                <v-text-field
+                    v-model="props.form"
+                    :items="['Proveedores', 'Electronico']"
+                    label="prueba"
+                >
+                </v-text-field>
+            </v-col>
             <v-col cols="2">
                 <v-select
                     v-model="ordenDePagoElectronico.tipoDeOrden"
@@ -15,7 +23,6 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.referencia"
-                    :counter="10"
                     label="Numero de referencia"
                 ></v-text-field>
             </v-col>
@@ -24,7 +31,6 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.nombreDelBeneficiario"
-                    :counter="10"
                     label="Nombre del beneficiario"
                 ></v-text-field>
             </v-col>
@@ -33,7 +39,6 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.numeroDeFacturas"
-                    :counter="10"
                     label="Numero de facturas"
                 ></v-text-field>
             </v-col>
@@ -42,7 +47,6 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.montoTotal"
-                    :counter="10"
                     label="Monto total"
                 ></v-text-field>
             </v-col>
@@ -51,7 +55,6 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.retencionISLR"
-                    :counter="10"
                     label="Monto retención ISLR"
                 ></v-text-field>
             </v-col>
@@ -59,7 +62,6 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.montoTransferencia"
-                    :counter="10"
                     label="Monto transferencia"
                 ></v-text-field>
             </v-col>
@@ -67,7 +69,6 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.montoDivisas"
-                    :counter="10"
                     label="Monto en divisas"
                 ></v-text-field>
             </v-col>
@@ -75,7 +76,6 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.comisionBancaria"
-                    :counter="10"
                     label="Comision bancaria"
                 ></v-text-field>
             </v-col>
@@ -84,7 +84,6 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.registroContable"
-                    :counter="10"
                     label="Nº Registro contable"
                 ></v-text-field>
             </v-col>
@@ -93,16 +92,19 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.autorizacion"
-                    :counter="10"
                     label="Nº Autorización"
                 ></v-text-field>
             </v-col>
 
-            <v-col cols="12" class="justify-center items-center p-6 mx-auto flex">
+            <v-col
+                cols="12"
+                class="justify-center items-center p-6 mx-auto flex"
+            >
                 <!-- <v-btn @click="() => console.log(ordenDePagoElectronico)"> -->
                 <v-btn
                     class="w-2/5 justify-center items-center m-2"
                     color="primary"
+                    type="submit"
                     @click="handleAddToList"
                 >
                     +
@@ -117,16 +119,19 @@
 
             <v-col cols="3"></v-col>
         </v-row>
+        <v-btn type="submit">example submit</v-btn>
     </v-form>
 </template>
 <script setup>
-import { reactive } from "vue";
+import { reactive, watch } from "vue";
 import "vuetify/styles";
 import "vuetify";
+import { staticError } from "../alerts/staticMessages";
 
 const emit = defineEmits(["addToList"]);
+const props = defineProps(["form"]);
 
-const ordenDePagoElectronico = reactive({
+var ordenDePagoElectronico = reactive({
     tipoDeOrden: "",
     referencia: "",
     nombreDelBeneficiario: "",
@@ -140,8 +145,38 @@ const ordenDePagoElectronico = reactive({
     registroContable: "",
 });
 
+const validateForm = (item) => {
+    //valida que no hallan propiedades vacias
+    const notEmpty = (x) => {
+        return x.length == 0;
+    };
+    console.log(Object.values(item), Object.values(item).some(notEmpty)); //#debug
+    return Object.values(item), Object.values(item).some(notEmpty);
+};
+
+const resetForm = () => {
+    ordenDePagoElectronico = {
+        tipoDeOrden: "",
+        referencia: "",
+        nombreDelBeneficiario: "",
+        numeroDeFacturas: "",
+        montoTotal: "",
+        montoTransferencia: "",
+        montoDivisas: "",
+        retencionISLR: "",
+        comisionBancaria: "",
+        autorizacion: "",
+        registroContable: "",
+    };
+};
 const handleAddToList = () => {
-    emit("addToList", ordenDePagoElectronico);
+    if (validateForm(ordenDePagoElectronico)) {
+        staticError("Complete el formulario");
+    } else {
+        emit("addToList", ordenDePagoElectronico);
+        resetForm();
+    }
+
     //reiniciar lista
 };
 </script>

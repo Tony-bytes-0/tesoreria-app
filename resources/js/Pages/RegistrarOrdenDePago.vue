@@ -1,29 +1,64 @@
 <script setup>
+import { staticError } from "@/Components/alerts/staticMessages";
 import AccountSelect from "@/Components/ordenes de pago/AccountSelect.vue";
 import Formulario from "@/Components/ordenes de pago/Formulario.vue";
 import ItemOnList from "@/Components/ordenes de pago/ItemOnList.vue";
 import TableheadThs from "@/Components/ordenes de pago/TableheadThs.vue";
 import Navbar from "@/Layouts/Navbar.vue";
-import { ref, defineProps } from "vue";
+import { ref, defineProps, reactive } from "vue";
 
-const props = defineProps(['cuentasNaviarca', 'cuentasGc'])
-var items = ref([]);
+const props = defineProps(["cuentasNaviarca", "cuentasGc"]);
+var items = ref([]); //items del formulario
 var idCounter = ref(0);
 
+
+
 const addToList = (newItem) => {
-    newItem = {...newItem, id: idCounter.value++ }
-    items.value.push(newItem);
-    console.log(idCounter.value)
-    console.log("añadido a la lista: ", newItem);
+    newItem = { ...newItem, id: idCounter.value++ };
+        items.value.push(newItem);
 };
 const deleteItem = (targetId) => {
-    items.value = items.value.filter((x) => x.id !== targetId)
-}
+    items.value = items.value.filter((x) => x.id !== targetId);
+};
+
+//cuenta bancaria
+var company = ref("Naviarca");
+var selectedAccount = ref({
+    banco_id: "",
+    codigo_cuenta: "",
+    moneda_id: "",
+    tipo_cuenta: "",
+    banco_nombre: "",
+});
+
+const accProps = (item) => {
+    return {
+        title: item.banco_nombre, // + " - " + item.codigo_cuenta,
+        subtitle:
+            item.banco_id +
+            " - " +
+            item.tipo_cuenta +
+            " - " +
+            item.codigo_cuenta,
+        value: {
+            id: item.id,
+            banco_id: item.banco_id,
+            codigo_cuenta: item.codigo_cuenta,
+            moneda_id: item.moneda_id,
+            tipo_cuenta: item.tipo_cuenta,
+            banco_nombre: item.banco_nombre,
+        },
+    };
+};
+
+const onSwitchClick = () => {
+    selectedAccount.value = "";
+};
 </script>
 
 <template>
     <!-- <Navbar /> -->
-     
+
     <Navbar>
         <v-row dense class="mt-20 ml-20 mr-20">
             <v-col md="12">
@@ -36,9 +71,36 @@ const deleteItem = (targetId) => {
             </v-col>
         </v-row>
 
-        <AccountSelect :cuentasNaviarca="props.cuentasNaviarca" :cuentasGc="props.cuentasGc" />
-        <Formulario @addToList="addToList"  />
-<!--         <h1>props!!!!!!!!!!!!: {{ props.cuentasBancarias }}</h1> -->
+        <!-- <AccountSelect :cuentasNaviarca="props.cuentasNaviarca" :cuentasGc="props.cuentasGc" /> -->
+        <v-divider :thickness="7">Datos de la cuenta</v-divider>
+        <v-row class="m-2">
+            <!-- <v-col cols="2"></v-col> -->
+            <v-col cols="3">
+                <v-switch
+                    v-model="company"
+                    :label="`Empresa: ${company}`"
+                    false-value="Gran cacique"
+                    true-value="Naviarca"
+                    hide-details
+                    @click="onSwitchClick"
+                ></v-switch>
+            </v-col>
+            <v-col cols="9">
+                <v-select
+                    v-model="selectedAccount"
+                    :items="
+                        company == 'Naviarca'
+                            ? props.cuentasNaviarca.original
+                            : props.cuentasGc.original
+                    "
+                    :item-props="accProps"
+                    label="Cuenta bancaria"
+                ></v-select>
+            </v-col>
+            <!-- <v-col cols="2"></v-col> -->
+        </v-row>
+        <Formulario @addToList="addToList" />
+
         <v-table height="300px" fixed-header>
             <thead>
                 <tr>
