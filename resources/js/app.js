@@ -8,6 +8,7 @@ import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
+//import { VDateInput } from 'vue3-datepicker'; // Add this line
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -31,6 +32,7 @@ createInertiaApp({
             components,
             directives,
         });
+        //app.component("Datepicker", Datepicker);
 
         return createApp({ render: () => h(App, props) })
             .use(plugin)

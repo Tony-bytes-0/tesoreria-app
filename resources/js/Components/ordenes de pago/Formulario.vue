@@ -2,7 +2,17 @@
     <!-- <v-chip class="ma-2" label> Datos de la orden </v-chip> -->
     <v-divider :thickness="7">Datos de la orden </v-divider>
     <v-form class="p-2" @submit.prevent>
-        <v-row>
+        <v-row align="center">
+            <!--             <v-container>
+                <v-row justify="center">
+                    <v-date-picker width="400"></v-date-picker>
+                </v-row>
+            </v-container> -->
+            <v-col cols="2" class="items-centrer justify-center mb-4">
+                    <input id type="date" class="custom-datepicker m-2 w-full" v-model="ordenDePagoElectronico.fecha" >
+                    
+            </v-col>
+
             <v-col cols="2">
                 <v-select
                     v-model="ordenDePagoElectronico.tipoDeOrden"
@@ -19,7 +29,7 @@
                 ></v-text-field>
             </v-col>
 
-            <v-col cols="4">
+            <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.nombreDelBeneficiario"
@@ -115,7 +125,7 @@
     </v-form>
 </template>
 <script setup>
-import { reactive, ref, watch } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import "vuetify/styles";
 import "vuetify";
 import { staticError } from "../alerts/staticMessages";
@@ -123,8 +133,10 @@ import { staticError } from "../alerts/staticMessages";
 const emit = defineEmits(["addToList", "submit"]);
 const props = defineProps(["form"]);
 
+
 var ordenDePagoElectronico = ref({
     tipoDeOrden: "",
+    fecha: "",
     referencia: "",
     nombreDelBeneficiario: "",
     numeroDeFacturas: "",
@@ -136,6 +148,10 @@ var ordenDePagoElectronico = ref({
     autorizacion: "",
     registroContable: "",
 });
+
+function handleInput(event) {
+  myValue.value = event.target.value
+}
 
 const validateForm = (item) => {
     //valida que no hallan propiedades vacias
@@ -149,6 +165,7 @@ const validateForm = (item) => {
 const resetForm = () => {
     ordenDePagoElectronico.value = {
         tipoDeOrden: "",
+        fecha:"",
         referencia: "",
         nombreDelBeneficiario: "",
         numeroDeFacturas: "",
@@ -171,8 +188,13 @@ const handleAddToList = () => {
 };
 
 const submit = () => {
-    emit('submit')
-}
+    console.log('formualario: ', ordenDePagoElectronico.value)
+    emit("submit");
+};
+onMounted(() => {
+    //const actualDate = new Date().toJSON().slice(0, 10);
+    //ordenDePagoElectronico.value.fecha = actualDate;
+})
 </script>
 
 <style scooped>
@@ -189,5 +211,8 @@ const submit = () => {
 }
 .custom-dark {
     color: gray !important;
+}
+.custom-datepicker{
+    color:black;
 }
 </style>

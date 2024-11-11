@@ -10,5 +10,6 @@
     <th>Comisión bancaria</th>
     <th>Nº Registro contable</th>
     <th>Nº Autorizacion</th>
+    <th>Fecha</th>
     <th></th>
 </template>

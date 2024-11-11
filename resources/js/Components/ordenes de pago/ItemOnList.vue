@@ -10,6 +10,7 @@
     <td>{{ item.comisionBancaria }}</td>
     <td>{{ item.registroContable }}</td>
     <td>{{ item.autorizacion }}</td>
+    <td>{{ item.fecha }}</td>
     <!-- <td>{{  item.id }}</td> -->
     <!-- Debug -->
     <td>
