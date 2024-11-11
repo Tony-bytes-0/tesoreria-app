@@ -14,15 +14,19 @@ return new class extends Migration
         Schema::create('orden_de_pago_electronicos', function (Blueprint $table) {
             // ['referencia_profit', 'autorizacion', 'monto_transferencia', 'monto_divisas', 'comision_bancaria', 'retencion_islr', 'registro_contable']
             //$table->id();
+            $table->timestamps();
+            $table->string('rif');
+            $table->string('cuenta_bancaria');
             $table->integer('orden');
             $table->integer('factura');
-            $table->integer('numero_orden');
-            $table->timestamps();
-            $table->string('referencia_profit');
+            $table->date('fecha');
+            $table->string('tipo');
+            $table->string('referencia');
+            $table->string('beneficiario');
             $table->string('autorizacion');
             $table->string('registro_contable');
-            $table->bigInteger('monto_transferencia');
-            $table->bigInteger('monto_divisas');
+            $table->bigInteger('transferencia');
+            $table->bigInteger('divisas');
             $table->bigInteger('comision_bancaria');
             $table->bigInteger('retencion_islr');
         });
