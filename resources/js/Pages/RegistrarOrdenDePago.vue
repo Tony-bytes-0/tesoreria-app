@@ -8,14 +8,21 @@ import Navbar from "@/Layouts/Navbar.vue";
 import axios from "axios";
 import { ref, defineProps, reactive } from "vue";
 
-const props = defineProps(["cuentasNaviarca", "cuentasGc"]);
+const props = defineProps(["cuentasNaviarca", "cuentasGc", "tasas"]);
 var items = ref([]); //items del formulario
 var idCounter = ref(0);
+var tasaUsd = ref(props.tasas.original.usd);
+var editandoTasa = ref(false);
 
 const addToList = (newItem) => {
-    console.log('agregando nuevo item:', newItem)
-    newItem = { ...newItem, id: idCounter.value++, rif:'080056043', cuenta_bancaria:selectedAccount.value.codigo_cuenta };
-        items.value.push(newItem);
+    console.log("agregando nuevo item:", newItem);
+    newItem = {
+        ...newItem,
+        id: idCounter.value++,
+        rif: "080056043",
+        cuenta_bancaria: selectedAccount.value.codigo_cuenta,
+    };
+    items.value.push(newItem);
 };
 const deleteItem = (targetId) => {
     items.value = items.value.filter((x) => x.id !== targetId);
@@ -54,21 +61,22 @@ const accProps = (item) => {
 const onSwitchClick = () => {
     selectedAccount.value = "";
 };
-// form submit, enviar, procesar
-//const submit = (objData) => {
+
 const submit = () => {
     try {
-        axios.post('/api/registrar_orden_de_pago', items.value )
-        .then((response) => {console.log('resultado de la respuesta: ', response)})
+        axios
+            .post("/api/registrar_orden_de_pago", items.value)
+            .then((response) => {
+                console.log("resultado de la respuesta: ", response);
+            });
     } catch (error) {
-        console.log('ocurrio un error desconocido: ', error)
+        console.log("ocurrio un error desconocido: ", error);
     }
-}
+};
 </script>
 
 <template>
     <!-- <Navbar /> -->
-
     <Navbar>
         <v-row dense class="mt-20 ml-20 mr-20">
             <v-col md="12">
@@ -79,9 +87,29 @@ const submit = () => {
                 >
                 </v-card>
             </v-col>
+
+            <v-row v-if="editandoTasa">
+                <v-col md="3">
+                    <v-text-field
+                        class="custom-dark"
+                        v-model="tasaUsd"
+                    ></v-text-field>
+                </v-col>
+                <v-col md="3"
+                    ><v-btn @click="editandoTasa = !editandoTasa"
+                        >guardar</v-btn
+                    ></v-col
+                >
+            </v-row>
+
+            <v-col md="12" v-else>
+                Tasa de cambio $: {{ tasaUsd }}
+                <v-btn class="p-2 ml-2" @click="editandoTasa = !editandoTasa">
+                    cambiar</v-btn
+                ></v-col
+            >
         </v-row>
 
-        <!-- <AccountSelect :cuentasNaviarca="props.cuentasNaviarca" :cuentasGc="props.cuentasGc" /> -->
         <v-divider :thickness="7">Datos de la cuenta</v-divider>
         <v-row class="m-2">
             <!-- <v-col cols="2"></v-col> -->
