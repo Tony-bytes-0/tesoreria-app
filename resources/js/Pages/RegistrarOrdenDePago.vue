@@ -5,6 +5,7 @@ import Formulario from "@/Components/ordenes de pago/Formulario.vue";
 import ItemOnList from "@/Components/ordenes de pago/ItemOnList.vue";
 import TableheadThs from "@/Components/ordenes de pago/TableheadThs.vue";
 import Navbar from "@/Layouts/Navbar.vue";
+import axios from "axios";
 import { ref, defineProps, reactive } from "vue";
 
 const props = defineProps(["cuentasNaviarca", "cuentasGc"]);
@@ -12,7 +13,8 @@ var items = ref([]); //items del formulario
 var idCounter = ref(0);
 
 const addToList = (newItem) => {
-    newItem = { ...newItem, id: idCounter.value++ };
+    console.log('agregando nuevo item:', newItem)
+    newItem = { ...newItem, id: idCounter.value++, rif:'080056043', cuenta_bancaria:selectedAccount.value.codigo_cuenta };
         items.value.push(newItem);
 };
 const deleteItem = (targetId) => {
@@ -53,8 +55,14 @@ const onSwitchClick = () => {
     selectedAccount.value = "";
 };
 // form submit, enviar, procesar
+//const submit = (objData) => {
 const submit = () => {
-    console.log('data a enviar: ', items.value, ' cuenta bancaria: ', selectedAccount.value)
+    try {
+        axios.post('/api/registrar_orden_de_pago', items.value )
+        .then((response) => {console.log('resultado de la respuesta: ', response)})
+    } catch (error) {
+        console.log('ocurrio un error desconocido: ', error)
+    }
 }
 </script>
 

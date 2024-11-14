@@ -17,18 +17,21 @@ return new class extends Migration
             $table->timestamps();
             $table->string('rif');
             $table->string('cuenta_bancaria');
-            $table->integer('orden');
-            $table->integer('factura');
+            //
             $table->date('fecha');
             $table->string('tipo');
-            $table->string('referencia');
+            $table->integer('orden');
             $table->string('beneficiario');
-            $table->string('autorizacion');
-            $table->string('registro_contable');
+            $table->integer('factura');
+            $table->bigInteger('monto_total');
+            //
+            $table->bigInteger('retencion_islr');
             $table->bigInteger('transferencia');
             $table->bigInteger('divisas');
             $table->bigInteger('comision_bancaria');
-            $table->bigInteger('retencion_islr');
+            $table->string('registro_contable');
+            $table->string('autorizacion');
+            //$table->bigInteger('monto_total');
         });
     }
 

@@ -1,14 +1,14 @@
 <template>
-    <td>{{ item.tipoDeOrden }}</td>
-    <td>{{ item.referencia }}</td>
-    <td>{{ item.nombreDelBeneficiario }}</td>
-    <td>{{ item.numeroDeFacturas }}</td>
-    <td>{{ item.montoTotal }}</td>
-    <td>{{ item.retencionISLR }}</td>
-    <td>{{ item.montoTransferencia }}</td>
-    <td>{{ item.montoDivisas }}</td>
-    <td>{{ item.comisionBancaria }}</td>
-    <td>{{ item.registroContable }}</td>
+    <td>{{ item.tipo }}</td>
+    <td>{{ item.orden }}</td>
+    <td>{{ item.beneficiario }}</td>
+    <td>{{ item.factura }}</td>
+    <td>{{ item.monto_total }}</td>
+    <td>{{ item.retencion_islr }}</td>
+    <td>{{ item.transferencia }}</td>
+    <td>{{ item.divisas }}</td>
+    <td>{{ item.comision_bancaria }}</td>
+    <td>{{ item.registro_contable }}</td>
     <td>{{ item.autorizacion }}</td>
     <td>{{ item.fecha }}</td>
     <!-- <td>{{  item.id }}</td> -->

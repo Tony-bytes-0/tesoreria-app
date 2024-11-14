@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\CuentasBancariasController;
+use App\Models\OrdenDePagoElectronico;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class OrdenDePagoController extends Controller
@@ -18,5 +20,35 @@ class OrdenDePagoController extends Controller
 
 
         return Inertia::render('RegistrarOrdenDePago', ['cuentasNaviarca' => $cuentasNaviarca, 'cuentasGc' => $cuentasGc]);
+    }
+
+    public function registrar(Request $request)
+    {
+
+        $data = $request->validate([
+            'orden' => 'required|string',
+            'factura'
+            => 'required|string',
+            'tipo' => 'required|string',
+            'referencia'
+            => 'required|string',
+            'beneficiario'
+            => 'required|string',
+            'autorizacion'
+            => 'required|string',
+            'registro_contable'
+            => 'required|string',
+            'fecha'
+            => 'required|string',
+            'transferencia'
+            => 'required|string',
+            'divisas'
+            => 'required|string',
+            'comision_bancaria'
+            => 'required|string',
+            'retencion_islr' => 'required|string'
+        ]);
+
+        OrdenDePagoElectronico::create($data);
     }
 }

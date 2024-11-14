@@ -9,13 +9,17 @@
                 </v-row>
             </v-container> -->
             <v-col cols="2" class="items-centrer justify-center mb-4">
-                    <input id type="date" class="custom-datepicker m-2 w-full" v-model="ordenDePagoElectronico.fecha" >
-                    
+                <input
+                    id
+                    type="date"
+                    class="custom-datepicker m-2 w-full"
+                    v-model="ordenDePagoElectronico.fecha"
+                />
             </v-col>
 
             <v-col cols="2">
                 <v-select
-                    v-model="ordenDePagoElectronico.tipoDeOrden"
+                    v-model="ordenDePagoElectronico.tipo"
                     :items="['Proveedores', 'Electronico']"
                     label="Tipo de orden"
                 >
@@ -24,7 +28,7 @@
             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.referencia"
+                    v-model="ordenDePagoElectronico.orden"
                     label="Numero de referencia"
                 ></v-text-field>
             </v-col>
@@ -32,7 +36,7 @@
             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.nombreDelBeneficiario"
+                    v-model="ordenDePagoElectronico.beneficiario"
                     label="Nombre del beneficiario"
                 ></v-text-field>
             </v-col>
@@ -40,7 +44,7 @@
             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.numeroDeFacturas"
+                    v-model="ordenDePagoElectronico.factura"
                     label="Numero de facturas"
                 ></v-text-field>
             </v-col>
@@ -48,7 +52,8 @@
             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.montoTotal"
+                    type="number"
+                    v-model="ordenDePagoElectronico.monto_total"
                     label="Monto total"
                 ></v-text-field>
             </v-col>
@@ -56,39 +61,39 @@
             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.retencionISLR"
+                    v-model="ordenDePagoElectronico.retencion_islr"
                     label="Monto retención ISLR"
                 ></v-text-field>
             </v-col>
             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.montoTransferencia"
+                    v-model="ordenDePagoElectronico.transferencia"
                     label="Monto transferencia"
                 ></v-text-field>
             </v-col>
-            <v-col cols="2">
+<!--             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.montoDivisas"
+                    v-model="ordenDePagoElectronico.divisas"
                     label="Monto en divisas"
                 ></v-text-field>
-            </v-col>
-            <v-col cols="2">
+            </v-col> -->
+<!--             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.comisionBancaria"
+                    v-model="ordenDePagoElectronico.comision_bancaria"
                     label="Comision bancaria"
                 ></v-text-field>
-            </v-col>
+            </v-col> -->
 
-            <v-col cols="2">
+<!--             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.registroContable"
+                    v-model="ordenDePagoElectronico.registro_contable"
                     label="Nº Registro contable"
                 ></v-text-field>
-            </v-col>
+            </v-col> -->
 
             <v-col cols="2">
                 <v-text-field
@@ -133,27 +138,25 @@ import { staticError } from "../alerts/staticMessages";
 const emit = defineEmits(["addToList", "submit"]);
 const props = defineProps(["form"]);
 
-
 var ordenDePagoElectronico = ref({
-    tipoDeOrden: "",
     fecha: "",
-    referencia: "",
-    nombreDelBeneficiario: "",
-    numeroDeFacturas: "",
-    montoTotal: "",
-    montoTransferencia: "",
-    montoDivisas: "",
-    retencionISLR: "",
-    comisionBancaria: "",
+    tipo: "",
+    orden: "",
+    beneficiario: "",
+    factura: "",
+    monto_total: "",
+    retencion_islr: "",
+    transferencia: "",
+    //divisas: "",
+    //comision_bancaria: "",
+    //registro_contable: "",
     autorizacion: "",
-    registroContable: "",
 });
 
-function handleInput(event) {
-  myValue.value = event.target.value
-}
+var calculatedTransferencia = ref(0)
 
 const validateForm = (item) => {
+    console.log('keys del bojeto', Object.keys(ordenDePagoElectronico.value))
     //valida que no hallan propiedades vacias
     const notEmpty = (x) => {
         return x.length == 0;
@@ -164,18 +167,18 @@ const validateForm = (item) => {
 
 const resetForm = () => {
     ordenDePagoElectronico.value = {
-        tipoDeOrden: "",
-        fecha:"",
-        referencia: "",
-        nombreDelBeneficiario: "",
-        numeroDeFacturas: "",
-        montoTotal: "",
-        montoTransferencia: "",
-        montoDivisas: "",
-        retencionISLR: "",
-        comisionBancaria: "",
+        fecha: "",
+        tipo: "",
+        orden: "",
+        beneficiario: "",
+        factura: "",
+        monto_total: "",
+        retencion_islr: "",
+        transferencia: "",
+        divisas: "",
+        comision_bancaria: "",
+        registro_contable: "",
         autorizacion: "",
-        registroContable: "",
     };
 };
 const handleAddToList = () => {
@@ -187,14 +190,18 @@ const handleAddToList = () => {
     }
 };
 
+const calcTransferencia = () => {
+    //if(ordenDePagoElectronico.value.)
+}
+
 const submit = () => {
-    console.log('formualario: ', ordenDePagoElectronico.value)
-    emit("submit");
+    console.log("formualario: ", ordenDePagoElectronico.value);
+    emit("submit", {...ordenDePagoElectronico.value });
 };
 onMounted(() => {
     //const actualDate = new Date().toJSON().slice(0, 10);
     //ordenDePagoElectronico.value.fecha = actualDate;
-})
+});
 </script>
 
 <style scooped>
@@ -212,7 +219,7 @@ onMounted(() => {
 .custom-dark {
     color: gray !important;
 }
-.custom-datepicker{
-    color:black;
+.custom-datepicker {
+    color: black;
 }
 </style>
