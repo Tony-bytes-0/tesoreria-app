@@ -1,6 +1,5 @@
 <script setup>
 import { staticError } from "@/Components/alerts/staticMessages";
-import AccountSelect from "@/Components/ordenes de pago/AccountSelect.vue";
 import Formulario from "@/Components/ordenes de pago/Formulario.vue";
 import ItemOnList from "@/Components/ordenes de pago/ItemOnList.vue";
 import TableheadThs from "@/Components/ordenes de pago/TableheadThs.vue";
@@ -8,6 +7,7 @@ import Navbar from "@/Layouts/Navbar.vue";
 import axios from "axios";
 import { ref, defineProps, reactive } from "vue";
 
+const validateForm = ref(true);
 const props = defineProps(["cuentasNaviarca", "cuentasGc", "tasas"]);
 const cuentasBancarias = ref({
     naviarca: props.cuentasNaviarca,
@@ -24,7 +24,7 @@ const addToList = (newItem) => {
     console.log("agregando nuevo item:", newItem);
     newItem = {
         ...newItem,
-        id: idCounter.value++
+        id: idCounter.value++,
     };
     items.value.push(newItem);
 };
@@ -74,10 +74,13 @@ const selectAccGroup = (key) => {
 };
 
 const submit = () => {
-    console.log('datos a enviar: ', items.value)
+    console.log("datos a enviar: ", items.value);
     try {
         axios
-            .post("/api/registrar_orden_de_pago", items.value)
+            .post("/api/registrar_orden_de_pago", {
+                items: items.value,
+                cuenta_bancaria: selectedAccount.value,
+            })
             .then((response) => {
                 console.log("resultado de la respuesta: ", response);
             });
@@ -105,12 +108,21 @@ const submit = () => {
                 >
             </v-row>
 
-            <v-col md="12" v-else>
+            <v-col md="3" align-self="center" v-else>
                 Tasa de cambio $: {{ tasaUsd }}
                 <v-btn class="p-2 ml-2" @click="editandoTasa = !editandoTasa">
                     cambiar</v-btn
                 ></v-col
             >
+            <v-col md="3" align-self="center">
+                <v-container>
+                    <v-switch
+                        v-model="validateForm"
+                        label="Validar formulario"
+                    ></v-switch
+                ></v-container>
+            </v-col>
+            <v-col md="3" align-self="center" >{{ validateForm ? 'Las validaciones estan activas' : 'validaciones desactivadas' }}</v-col>
         </v-row>
 
         <v-divider :thickness="7">Datos de la cuenta</v-divider>
@@ -169,7 +181,7 @@ const submit = () => {
 
             <!-- <v-col cols="2"></v-col> -->
         </v-row>
-        <Formulario @addToList="addToList" @submit="submit" />
+        <Formulario @addToList="addToList" @submit="submit" :validateForm = "validateForm" />
 
         <v-table height="300px" fixed-header>
             <thead>

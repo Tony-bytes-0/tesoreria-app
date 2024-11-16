@@ -134,7 +134,7 @@ import "vuetify";
 import { staticError } from "../alerts/staticMessages";
 
 const emit = defineEmits(["addToList", "submit"]);
-const props = defineProps(["form"]);
+const props = defineProps(["validateForm"]);
 
 var ordenDePagoElectronico = ref({
     fecha: "",
@@ -161,13 +161,14 @@ const comision_bancaria = computed(() => {
 });
 
 const validateForm = (item) => {
-    console.log("keys del bojeto", Object.keys(ordenDePagoElectronico.value));
+    //console.log("keys del bojeto", Object.keys(ordenDePagoElectronico.value)); //debug
     //valida que no hallan propiedades vacias
+
+    delete item.concepto //propiedad no validable
     const notEmpty = (x) => {
         return x.length == 0;
     };
-    console.log(Object.values(item), Object.values(item).some(notEmpty)); //#debug
-    return Object.values(item), Object.values(item).some(notEmpty);
+    return Object.values(item).some(notEmpty);
 };
 
 const resetForm = () => {
@@ -185,13 +186,13 @@ const resetForm = () => {
     };
 };
 const handleAddToList = () => {
-    if (validateForm(ordenDePagoElectronico.value)) {
+    if (validateForm(ordenDePagoElectronico.value) && props.validateForm) {
         staticError("Complete el formulario");
     } else {
         emit("addToList", {
             ...ordenDePagoElectronico.value,
-            transferencia: transferencia,
-            comision_bancaria: comision_bancaria,
+            transferencia: transferencia.value,
+            comision_bancaria: comision_bancaria.value,
         });
         resetForm();
     }
