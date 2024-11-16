@@ -62,11 +62,8 @@ const accProps = (item) => {
     };
 };
 
-const onSwitchClick = () => {
-    selectedAccount.value = "";
-};
-
 const selectAccGroup = (key) => {
+    selectedAccount.value = "";
     company.value = key;
     if (key == "serviencomiendas") {
         cuentasDisponibles.value = [];
@@ -77,6 +74,7 @@ const selectAccGroup = (key) => {
 };
 
 const submit = () => {
+    console.log('datos a enviar: ', items.value)
     try {
         axios
             .post("/api/registrar_orden_de_pago", items.value)

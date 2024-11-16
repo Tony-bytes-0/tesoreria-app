@@ -1,6 +1,6 @@
 <template>
     <td>{{ item.tipo }}</td>
-    <td>{{ item.referencia }}</td>
+    <!-- <td>{{ item.referencia }}</td> -->
     <td>{{ item.beneficiario }}</td>
     <td>{{ item.factura }}</td>
     <td>{{ item.monto_total }}</td>

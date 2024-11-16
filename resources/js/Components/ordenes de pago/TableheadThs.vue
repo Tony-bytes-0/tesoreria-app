@@ -1,6 +1,6 @@
 <template>
     <th>Tipo de orden</th>
-    <th>Nº referencia</th>
+    <!-- <th>Nº referencia</th> -->
     <th>Nombre</th>
     <th>Nº factura</th>
     <th>Monto total</th>

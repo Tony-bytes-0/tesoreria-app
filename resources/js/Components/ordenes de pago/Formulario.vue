@@ -3,11 +3,7 @@
     <v-divider :thickness="7">Datos de la orden </v-divider>
     <v-form class="p-2" @submit.prevent>
         <v-row align="center">
-            <!--             <v-container>
-                <v-row justify="center">
-                    <v-date-picker width="400"></v-date-picker>
-                </v-row>
-            </v-container> -->
+            <v-col cols="1"></v-col>
             <v-col cols="2" class="items-centrer justify-center mb-4">
                 <input
                     id
@@ -25,13 +21,13 @@
                 >
                 </v-select>
             </v-col>
-            <v-col cols="2">
+            <!--             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.referencia"
                     label="Numero de referencia"
                 ></v-text-field>
-            </v-col>
+            </v-col> -->
 
             <v-col cols="2">
                 <v-text-field
@@ -57,6 +53,7 @@
                     label="Monto total"
                 ></v-text-field>
             </v-col>
+            <v-col cols="1"></v-col>
         </v-row>
         <v-row>
             <v-col cols="2"></v-col>
@@ -102,26 +99,7 @@
                 ></v-text-field>
             </v-col>
         </v-row>
-        <!--         <v-row>
-            <v-col cols="4"></v-col>
-            <v-col cols="2">
-                <v-text-field
-                    class="custom-dark custom-input"
-                    v-model="transferencia"
-                    label="Monto transferencia"
-                    disabled
-                ></v-text-field>
-            </v-col>
-            <v-col cols="2">
-                <v-text-field
-                    class="custom-dark"
-                    v-model="comision_bancaria"
-                    label="Comision bancaria"
-                    disabled
-                ></v-text-field>
-            </v-col>
-            <v-col cols="4"></v-col>
-        </v-row> -->
+
         <v-row>
             <v-col
                 cols="12"
@@ -161,7 +139,7 @@ const props = defineProps(["form"]);
 var ordenDePagoElectronico = ref({
     fecha: "",
     tipo: "",
-    referencia: "",
+    //referencia: "",
     beneficiario: "",
     factura: "",
     monto_total: "",
@@ -196,7 +174,7 @@ const resetForm = () => {
     ordenDePagoElectronico.value = {
         fecha: "",
         tipo: "",
-        referencia: "",
+        //referencia: "",
         beneficiario: "",
         factura: "",
         monto_total: "",
