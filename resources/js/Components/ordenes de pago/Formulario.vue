@@ -28,7 +28,7 @@
             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.orden"
+                    v-model="ordenDePagoElectronico.referencia"
                     label="Numero de referencia"
                 ></v-text-field>
             </v-col>
@@ -45,7 +45,7 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.factura"
-                    label="Numero de facturas"
+                    label="Numero de factura"
                 ></v-text-field>
             </v-col>
 
@@ -57,7 +57,9 @@
                     label="Monto total"
                 ></v-text-field>
             </v-col>
-
+        </v-row>
+        <v-row>
+            <v-col cols="2"></v-col>
             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
@@ -65,35 +67,6 @@
                     label="Monto retención ISLR"
                 ></v-text-field>
             </v-col>
-            <v-col cols="2">
-                <v-text-field
-                    class="custom-dark"
-                    v-model="ordenDePagoElectronico.transferencia"
-                    label="Monto transferencia"
-                ></v-text-field>
-            </v-col>
-<!--             <v-col cols="2">
-                <v-text-field
-                    class="custom-dark"
-                    v-model="ordenDePagoElectronico.divisas"
-                    label="Monto en divisas"
-                ></v-text-field>
-            </v-col> -->
-<!--             <v-col cols="2">
-                <v-text-field
-                    class="custom-dark"
-                    v-model="ordenDePagoElectronico.comision_bancaria"
-                    label="Comision bancaria"
-                ></v-text-field>
-            </v-col> -->
-
-<!--             <v-col cols="2">
-                <v-text-field
-                    class="custom-dark"
-                    v-model="ordenDePagoElectronico.registro_contable"
-                    label="Nº Registro contable"
-                ></v-text-field>
-            </v-col> -->
 
             <v-col cols="2">
                 <v-text-field
@@ -102,7 +75,54 @@
                     label="Nº Autorización"
                 ></v-text-field>
             </v-col>
-
+            <v-col cols="2">
+                <v-text-field
+                    class="custom-dark custom-input"
+                    v-model="transferencia"
+                    label="Monto transferencia"
+                    disabled
+                ></v-text-field>
+            </v-col>
+            <v-col cols="2">
+                <v-text-field
+                    class="custom-dark"
+                    v-model="comision_bancaria"
+                    label="Comision bancaria"
+                    disabled
+                ></v-text-field>
+            </v-col>
+            <v-col cols="2"></v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="12">
+                <v-text-field
+                    class="custom-dark"
+                    v-model="ordenDePagoElectronico.concepto"
+                    label="Concepto ( opcional )"
+                ></v-text-field>
+            </v-col>
+        </v-row>
+        <!--         <v-row>
+            <v-col cols="4"></v-col>
+            <v-col cols="2">
+                <v-text-field
+                    class="custom-dark custom-input"
+                    v-model="transferencia"
+                    label="Monto transferencia"
+                    disabled
+                ></v-text-field>
+            </v-col>
+            <v-col cols="2">
+                <v-text-field
+                    class="custom-dark"
+                    v-model="comision_bancaria"
+                    label="Comision bancaria"
+                    disabled
+                ></v-text-field>
+            </v-col>
+            <v-col cols="4"></v-col>
+        </v-row> -->
+        <v-row>
             <v-col
                 cols="12"
                 class="justify-center items-center p-6 mx-auto flex"
@@ -124,13 +144,13 @@
                     Procesar
                 </v-btn>
             </v-col>
-
-            <v-col cols="3"></v-col>
         </v-row>
+
+        <v-row> </v-row>
     </v-form>
 </template>
 <script setup>
-import { onMounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import "vuetify/styles";
 import "vuetify";
 import { staticError } from "../alerts/staticMessages";
@@ -141,22 +161,29 @@ const props = defineProps(["form"]);
 var ordenDePagoElectronico = ref({
     fecha: "",
     tipo: "",
-    orden: "",
+    referencia: "",
     beneficiario: "",
     factura: "",
     monto_total: "",
+    //
     retencion_islr: "",
-    transferencia: "",
-    //divisas: "",
-    //comision_bancaria: "",
-    //registro_contable: "",
     autorizacion: "",
+    concepto: "",
 });
 
-var calculatedTransferencia = ref(0)
+const transferencia = computed(() => {
+    return (
+        ordenDePagoElectronico.value.monto_total -
+        ordenDePagoElectronico.value.retencion_islr
+    );
+});
+
+const comision_bancaria = computed(() => {
+    return 0.0025 * ordenDePagoElectronico.value.monto_total;
+});
 
 const validateForm = (item) => {
-    console.log('keys del bojeto', Object.keys(ordenDePagoElectronico.value))
+    console.log("keys del bojeto", Object.keys(ordenDePagoElectronico.value));
     //valida que no hallan propiedades vacias
     const notEmpty = (x) => {
         return x.length == 0;
@@ -169,34 +196,32 @@ const resetForm = () => {
     ordenDePagoElectronico.value = {
         fecha: "",
         tipo: "",
-        orden: "",
+        referencia: "",
         beneficiario: "",
         factura: "",
         monto_total: "",
+        //
         retencion_islr: "",
-        transferencia: "",
-        divisas: "",
-        comision_bancaria: "",
-        registro_contable: "",
         autorizacion: "",
+        concepto: "",
     };
 };
 const handleAddToList = () => {
     if (validateForm(ordenDePagoElectronico.value)) {
         staticError("Complete el formulario");
     } else {
-        emit("addToList", ordenDePagoElectronico.value);
+        emit("addToList", {
+            ...ordenDePagoElectronico.value,
+            transferencia: transferencia,
+            comision_bancaria: comision_bancaria,
+        });
         resetForm();
     }
 };
 
-const calcTransferencia = () => {
-    //if(ordenDePagoElectronico.value.)
-}
-
 const submit = () => {
     console.log("formualario: ", ordenDePagoElectronico.value);
-    emit("submit", {...ordenDePagoElectronico.value });
+    emit("submit", { ...ordenDePagoElectronico.value });
 };
 onMounted(() => {
     //const actualDate = new Date().toJSON().slice(0, 10);

@@ -9,6 +9,12 @@ import axios from "axios";
 import { ref, defineProps, reactive } from "vue";
 
 const props = defineProps(["cuentasNaviarca", "cuentasGc", "tasas"]);
+const cuentasBancarias = ref({
+    naviarca: props.cuentasNaviarca,
+    granCacique: props.cuentasGc,
+    //añadir cuentas serviencomiendas!!!
+});
+var cuentasDisponibles = ref([]);
 var items = ref([]); //items del formulario
 var idCounter = ref(0);
 var tasaUsd = ref(props.tasas.original.usd);
@@ -18,9 +24,7 @@ const addToList = (newItem) => {
     console.log("agregando nuevo item:", newItem);
     newItem = {
         ...newItem,
-        id: idCounter.value++,
-        rif: "080056043",
-        cuenta_bancaria: selectedAccount.value.codigo_cuenta,
+        id: idCounter.value++
     };
     items.value.push(newItem);
 };
@@ -62,6 +66,16 @@ const onSwitchClick = () => {
     selectedAccount.value = "";
 };
 
+const selectAccGroup = (key) => {
+    company.value = key;
+    if (key == "serviencomiendas") {
+        cuentasDisponibles.value = [];
+    } else {
+        cuentasDisponibles.value = cuentasBancarias.value[key].original;
+    }
+    //console.log(cuentasBancarias.value[key].original) //[key].original, 'key: ', value)
+};
+
 const submit = () => {
     try {
         axios
@@ -79,15 +93,6 @@ const submit = () => {
     <!-- <Navbar /> -->
     <Navbar>
         <v-row dense class="mt-20 ml-20 mr-20">
-            <v-col md="12">
-                <v-card
-                    class="mx-auto p-6 justify-center text-center mb-4"
-                    title="Registrar orden de pago"
-                    variant="outlined"
-                >
-                </v-card>
-            </v-col>
-
             <v-row v-if="editandoTasa">
                 <v-col md="3">
                     <v-text-field
@@ -112,29 +117,58 @@ const submit = () => {
 
         <v-divider :thickness="7">Datos de la cuenta</v-divider>
         <v-row class="m-2">
-            <!-- <v-col cols="2"></v-col> -->
-            <v-col cols="3">
-                <v-switch
-                    v-model="company"
-                    :label="`Empresa: ${company}`"
-                    false-value="Gran cacique"
-                    true-value="Naviarca"
-                    hide-details
-                    @click="onSwitchClick"
-                ></v-switch>
+            <v-col md="12">
+                <v-card
+                    class="mx-auto p-6 justify-center text-center mb-4"
+                    title="Registrar orden de pago"
+                    variant="outlined"
+                >
+                </v-card>
             </v-col>
-            <v-col cols="9">
+        </v-row>
+        <v-row class="m-2">
+            <!-- <v-col cols="2"></v-col> -->
+
+            <v-row align-content="center">
+                <v-container fluid>
+                    <v-img
+                        :width="300"
+                        aspect-ratio="16/9"
+                        cover
+                        src="https://cdn.vuetifyjs.com/images/parallax/material.jpg"
+                    ></v-img>
+                </v-container>
+            </v-row>
+            <v-col cols="2">
+                <v-col cols="12" class="text-center p-2">
+                    <v-btn color="primary" @click="selectAccGroup('naviarca')"
+                        >Naviarca</v-btn
+                    >
+                </v-col>
+                <v-col cols="12" class="text-center p-2">
+                    <v-btn
+                        color="primary"
+                        @click="selectAccGroup('granCacique')"
+                        >Gran cacique</v-btn
+                    >
+                </v-col>
+                <v-col cols="12" class="text-center p-2">
+                    <v-btn
+                        color="primary"
+                        @click="selectAccGroup('serviencomiendas')"
+                        >Serviencomiendas</v-btn
+                    >
+                </v-col>
+            </v-col>
+            <v-col cols="7" align-self="end">
                 <v-select
                     v-model="selectedAccount"
-                    :items="
-                        company == 'Naviarca'
-                            ? props.cuentasNaviarca.original
-                            : props.cuentasGc.original
-                    "
+                    :items="cuentasDisponibles"
                     :item-props="accProps"
                     label="Cuenta bancaria"
                 ></v-select>
             </v-col>
+
             <!-- <v-col cols="2"></v-col> -->
         </v-row>
         <Formulario @addToList="addToList" @submit="submit" />
