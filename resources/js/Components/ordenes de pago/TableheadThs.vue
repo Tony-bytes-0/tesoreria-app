@@ -1,15 +1,15 @@
 <template>
-    <th>Tipo de orden</th>
-    <!-- <th>Nº referencia</th> -->
-    <th>Nombre</th>
-    <th>Nº factura</th>
-    <th>Monto total</th>
-    <th>ISLR</th>
-    <th>Nº Autorizacion</th>
-    <th>Transferencia</th>
-    <th>Comisión bancaria</th>
-    <th>Concepto</th>
-    <th>Fecha</th>
-    <th></th>
-    <th></th>
+    <th class="text-center">Tipo de orden</th>
+    <!-- <th class="text-center">Nº referencia</th> -->
+    <th class="text-center">Nombre</th>
+    <th class="text-center">Nº factura</th>
+    <th class="text-center">Monto total</th>
+    <th class="text-center">ISLR</th>
+    <th class="text-center">Nº Autorizacion</th>
+    <th class="text-center">Transferencia</th>
+    <th class="text-center">Comisión bancaria</th>
+    <th class="text-center">Concepto</th>
+    <th class="text-center">Fecha</th>
+    <th class="text-center"></th>
+    <th class="text-center"></th>
 </template>

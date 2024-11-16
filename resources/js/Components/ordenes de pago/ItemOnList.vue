@@ -1,17 +1,17 @@
 <template>
-    <td>{{ item.tipo }}</td>
-    <!-- <td>{{ item.referencia }}</td> -->
-    <td>{{ item.beneficiario }}</td>
-    <td>{{ item.factura }}</td>
-    <td>{{ item.monto_total }}</td>
-    <td>{{ item.retencion_islr }}</td>
-    <td>{{ item.autorizacion }}</td>
-    <td>{{ item.transferencia }}</td>
-    <td>{{ item.comision_bancaria }}</td>
-    <td>{{ item.concepto }}</td>
-    <td>{{ item.fecha }}</td>
+    <td class="text-center">{{ item.tipo }}</td>
+    <!-- <td class="text-center">{{ item.referencia }}</td> -->
+    <td class="text-center">{{ item.beneficiario }}</td>
+    <td class="text-center">{{ item.factura }}</td>
+    <td class="text-center">{{ item.monto_total }}</td>
+    <td class="text-center">{{ item.retencion_islr }}</td>
+    <td class="text-center">{{ item.autorizacion }}</td>
+    <td class="text-center">{{ item.transferencia }}</td>
+    <td class="text-center">{{ item.comision_bancaria }}</td>
+    <td class="text-center">{{ item.concepto }}</td>
+    <td class="text-center">{{ item.fecha }}</td>
     <!-- Debug -->
-    <td>
+    <td class="text-center">
         <v-btn
             variant="text"
             color="primary"
