@@ -157,14 +157,15 @@ const transferencia = computed(() => {
 });
 
 const comision_bancaria = computed(() => {
-    return 0.0025 * ordenDePagoElectronico.value.monto_total;
+    return 0.0025 * ordenDePagoElectronico.value.monto_total.toString();
 });
 
 const validateForm = (item) => {
     //console.log("keys del bojeto", Object.keys(ordenDePagoElectronico.value)); //debug
     //valida que no hallan propiedades vacias
-
-    delete item.concepto //propiedad no validable
+    //var validationObject = item
+    //delete validationObject.concepto //propiedad no validable
+    
     const notEmpty = (x) => {
         return x.length == 0;
     };
@@ -189,6 +190,7 @@ const handleAddToList = () => {
     if (validateForm(ordenDePagoElectronico.value) && props.validateForm) {
         staticError("Complete el formulario");
     } else {
+        console.log('al emitir este es el concepto: ', ordenDePagoElectronico.value.concepto)
         emit("addToList", {
             ...ordenDePagoElectronico.value,
             transferencia: transferencia.value,

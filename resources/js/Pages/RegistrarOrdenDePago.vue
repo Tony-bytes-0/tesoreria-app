@@ -25,6 +25,11 @@ const addToList = (newItem) => {
     newItem = {
         ...newItem,
         id: idCounter.value++,
+        banco_nombre: selectedAccount.value.banco_nombre,
+        codigo_cuenta: selectedAccount.value.codigo_cuenta,
+        tipo_cuenta: selectedAccount.value.tipo_cuenta,
+        numero_orden_de_pago: '0',
+        rif: '08005604-3'
     };
     items.value.push(newItem);
 };
@@ -77,10 +82,9 @@ const submit = () => {
     console.log("datos a enviar: ", items.value);
     try {
         axios
-            .post("/api/registrar_orden_de_pago", {
-                items: items.value,
-                cuenta_bancaria: selectedAccount.value,
-            })
+            .post("/api/registrar_orden_de_pago", {items: items.value})
+                //cuenta_bancaria: selectedAccount.value,
+            //})
             .then((response) => {
                 console.log("resultado de la respuesta: ", response);
             });

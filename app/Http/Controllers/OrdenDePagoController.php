@@ -27,24 +27,33 @@ class OrdenDePagoController extends Controller
 
     public function registrar(Request $request)
     {
-        $data = $request->validate([
-            'items' => 'array',
-            'items.*.referencia' => 'string',
-            'items.*.factura' => 'required|string',
+        $validatedData = $request->validate([
+            'items' => 'array|min:1',
+            'items.*.rif' => 'required|string',
+            'items.*.fecha' => 'required|date',
             'items.*.tipo' => 'required|string',
             'items.*.beneficiario' => 'required|string',
+            'items.*.factura' => 'required|string',
+            'items.*.monto_total' => 'required|string',
+            'items.*.retencion_islr' => 'required|string',
             'items.*.autorizacion' => 'required|string',
-            'items.*.fecha' => 'required|date',
             'items.*.transferencia' => 'required|numeric',
             'items.*.comision_bancaria' => 'required|numeric',
-            'items.*.retencion_islr' => 'required|string',
-            #'cuenta_bancaria' => 'array',
-            #'cuenta_bancaria.*.banco_id' => 'string',
-            'cuenta_bancaria.*.banco_nombre' => 'string',
-            'cuenta_bancaria.*.codigo_cuenta' => 'string',
-            'cuenta_bancaria.*.tipo_cuenta' => 'string',
+            'items.*.concepto' => 'string',
+            'items.*.banco_nombre' => 'required|string',
+            'items.*.codigo_cuenta' => 'required|string',
+            'items.*.tipo_cuenta' => 'required|string',
+            'items.*.numero_orden_de_pago' => 'string'
         ]);
-        dd($data['items']);
-        OrdenDePagoElectronico::create($data);
+
+        $ordenDePagos = collect($validatedData["items"])->map(function ($item) {
+            return OrdenDePagoElectronico::create($item);
+        });
+
+        return response()->json([
+            'message' => 'Ordenes de pago electrónicas registradas exitosamente.',
+            'num_records_saved' => count($ordenDePagos),
+            'saved_records' => $ordenDePagos,
+        ], 201);
     }
 }
