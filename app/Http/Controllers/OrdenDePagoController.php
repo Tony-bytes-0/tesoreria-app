@@ -27,31 +27,24 @@ class OrdenDePagoController extends Controller
 
     public function registrar(Request $request)
     {
-
         $data = $request->validate([
-            'orden' => 'required|string',
-            'factura'
-            => 'required|string',
-            'tipo' => 'required|string',
-            'referencia'
-            => 'required|string',
-            'beneficiario'
-            => 'required|string',
-            'autorizacion'
-            => 'required|string',
-            'registro_contable'
-            => 'required|string',
-            'fecha'
-            => 'required|string',
-            'transferencia'
-            => 'required|string',
-            'divisas'
-            => 'required|string',
-            'comision_bancaria'
-            => 'required|string',
-            'retencion_islr' => 'required|string'
+            'items' => 'array',
+            'items.*.referencia' => 'string',
+            'items.*.factura' => 'required|string',
+            'items.*.tipo' => 'required|string',
+            'items.*.beneficiario' => 'required|string',
+            'items.*.autorizacion' => 'required|string',
+            'items.*.fecha' => 'required|date',
+            'items.*.transferencia' => 'required|numeric',
+            'items.*.comision_bancaria' => 'required|numeric',
+            'items.*.retencion_islr' => 'required|string',
+            #'cuenta_bancaria' => 'array',
+            #'cuenta_bancaria.*.banco_id' => 'string',
+            'cuenta_bancaria.*.banco_nombre' => 'string',
+            'cuenta_bancaria.*.codigo_cuenta' => 'string',
+            'cuenta_bancaria.*.tipo_cuenta' => 'string',
         ]);
-
+        dd($data['items']);
         OrdenDePagoElectronico::create($data);
     }
 }
