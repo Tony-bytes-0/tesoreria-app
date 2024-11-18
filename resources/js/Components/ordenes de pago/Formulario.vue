@@ -1,6 +1,6 @@
 <template>
     <!-- <v-chip class="ma-2" label> Datos de la orden </v-chip> -->
-    <v-divider :thickness="7">Datos de la orden </v-divider>
+    <v-divider :thickness="7">Datos de la orden de pago</v-divider>
     <v-form class="p-2" @submit.prevent>
         <v-row align="center">
             <v-col cols="1"></v-col>
@@ -150,26 +150,31 @@ var ordenDePagoElectronico = ref({
 });
 
 const transferencia = computed(() => {
-    return (
+    const newValue = parseFloat(
         ordenDePagoElectronico.value.monto_total -
-        ordenDePagoElectronico.value.retencion_islr
+            ordenDePagoElectronico.value.retencion_islr
+    );
+    return (
+        Number(newValue.toFixed(2))
     );
 });
 
 const comision_bancaria = computed(() => {
-    return 0.0025 * ordenDePagoElectronico.value.monto_total.toString();
+    const newValue = parseFloat(
+        0.0025 * ordenDePagoElectronico.value.monto_total.toString()
+    );
+    return Number(newValue.toFixed(2))
+    
 });
 
 const validateForm = (item) => {
-    //console.log("keys del bojeto", Object.keys(ordenDePagoElectronico.value)); //debug
-    //valida que no hallan propiedades vacias
-    //var validationObject = item
-    //delete validationObject.concepto //propiedad no validable
-    
+    var validationObject = Object.assign({}, item);
+    delete validationObject.concepto; //propiedad no validable
+
     const notEmpty = (x) => {
         return x.length == 0;
     };
-    return Object.values(item).some(notEmpty);
+    return Object.values(validationObject).some(notEmpty);
 };
 
 const resetForm = () => {
@@ -190,7 +195,10 @@ const handleAddToList = () => {
     if (validateForm(ordenDePagoElectronico.value) && props.validateForm) {
         staticError("Complete el formulario");
     } else {
-        console.log('al emitir este es el concepto: ', ordenDePagoElectronico.value.concepto)
+        console.log(
+            "al emitir este es el concepto: ",
+            ordenDePagoElectronico.value.concepto
+        );
         emit("addToList", {
             ...ordenDePagoElectronico.value,
             transferencia: transferencia.value,
@@ -227,6 +235,6 @@ onMounted(() => {
 }
 .custom-datepicker {
     color: black;
-    margin:20px;
+    margin: 20px;
 }
 </style>

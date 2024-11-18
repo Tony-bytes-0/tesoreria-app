@@ -5,7 +5,7 @@ import ItemOnList from "@/Components/ordenes de pago/ItemOnList.vue";
 import TableheadThs from "@/Components/ordenes de pago/TableheadThs.vue";
 import Navbar from "@/Layouts/Navbar.vue";
 import axios from "axios";
-import { ref, defineProps, reactive } from "vue";
+import { ref, defineProps } from "vue";
 
 const validateForm = ref(true);
 const props = defineProps(["cuentasNaviarca", "cuentasGc", "tasas"]);
@@ -21,17 +21,21 @@ var tasaUsd = ref(props.tasas.original.usd);
 var editandoTasa = ref(false);
 
 const addToList = (newItem) => {
-    console.log("agregando nuevo item:", newItem);
-    newItem = {
-        ...newItem,
-        id: idCounter.value++,
-        banco_nombre: selectedAccount.value.banco_nombre,
-        codigo_cuenta: selectedAccount.value.codigo_cuenta,
-        tipo_cuenta: selectedAccount.value.tipo_cuenta,
-        numero_orden_de_pago: "0",
-        rif: "08005604-3",
-    };
-    items.value.push(newItem);
+    console.log("agregando nuevo item:", newItem, selectedAccount.value);
+    if (selectedAccount.value.codigo_cuenta.length < 1 && validateForm.value) {
+        staticError("Seleccione una cuenta bancaria");
+    } else {
+        newItem = {
+            ...newItem,
+            id: idCounter.value++,
+            banco_nombre: selectedAccount.value.banco_nombre,
+            codigo_cuenta: selectedAccount.value.codigo_cuenta,
+            tipo_cuenta: selectedAccount.value.tipo_cuenta,
+            numero_orden_de_pago: "0",
+            rif: "08005604-3",
+        };
+        items.value.push(newItem);
+    }
 };
 const deleteItem = (targetId) => {
     items.value = items.value.filter((x) => x.id !== targetId);
@@ -71,7 +75,13 @@ const accProps = (item) => {
 };
 
 const selectAccGroup = (key) => {
-    selectedAccount.value = "";
+    selectedAccount.value = {
+        banco_id: "",
+        codigo_cuenta: "",
+        moneda_id: "",
+        tipo_cuenta: "",
+        banco_nombre: "",
+    };
     company.value = key;
     if (key == "serviencomiendas") {
         cuentasDisponibles.value = [];
@@ -98,6 +108,16 @@ const submit = () => {
     <!-- <Navbar /> -->
     <Navbar>
         <v-row dense class="mt-20 ml-20 mr-20">
+            <v-col md="12">
+                <v-card
+                    class="mx-auto p-6 justify-center text-center mb-4"
+                    title="Registrar orden de pago"
+                    variant="outlined"
+                >
+                </v-card>
+            </v-col>
+        </v-row>
+        <v-row dense class=" ml-20 mr-20">
             <v-row v-if="editandoTasa">
                 <v-col md="3">
                     <v-text-field
@@ -134,16 +154,7 @@ const submit = () => {
         </v-row>
 
         <v-divider :thickness="7">Datos de la cuenta</v-divider>
-        <v-row class="m-2">
-            <v-col md="12">
-                <v-card
-                    class="mx-auto p-6 justify-center text-center mb-4"
-                    title="Registrar orden de pago"
-                    variant="outlined"
-                >
-                </v-card>
-            </v-col>
-        </v-row>
+
         <v-row class="m-2">
             <!-- <v-col cols="2"></v-col> https://cdn.vuetifyjs.com/images/parallax/material.jpg-->
 
@@ -167,14 +178,16 @@ const submit = () => {
                     </v-btn>
                 </v-col>
                 <v-col cols="12" class="text-center p-2">
-                    <v-btn @click="selectAccGroup('granCacique')"
-                    :class="{ selected: company == 'granCacique' }"
+                    <v-btn
+                        @click="selectAccGroup('granCacique')"
+                        :class="{ selected: company == 'granCacique' }"
                         >Gran cacique</v-btn
                     >
                 </v-col>
                 <v-col cols="12" class="text-center p-2">
-                    <v-btn @click="selectAccGroup('serviencomiendas')"
-                    :class="{ selected: company == 'serviencomiendas' }"
+                    <v-btn
+                        @click="selectAccGroup('serviencomiendas')"
+                        :class="{ selected: company == 'serviencomiendas' }"
                         >Serviencomiendas</v-btn
                     >
                 </v-col>
@@ -220,5 +233,4 @@ button.v-btn.selected {
     border: 2px solid #add8e6; /* Light blue color */
     transition: all 0.3s ease;
 }
-
 </style>
