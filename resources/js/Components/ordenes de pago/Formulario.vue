@@ -227,5 +227,6 @@ onMounted(() => {
 }
 .custom-datepicker {
     color: black;
+    margin:20px;
 }
 </style>

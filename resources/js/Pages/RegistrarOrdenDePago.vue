@@ -28,13 +28,16 @@ const addToList = (newItem) => {
         banco_nombre: selectedAccount.value.banco_nombre,
         codigo_cuenta: selectedAccount.value.codigo_cuenta,
         tipo_cuenta: selectedAccount.value.tipo_cuenta,
-        numero_orden_de_pago: '0',
-        rif: '08005604-3'
+        numero_orden_de_pago: "0",
+        rif: "08005604-3",
     };
     items.value.push(newItem);
 };
 const deleteItem = (targetId) => {
     items.value = items.value.filter((x) => x.id !== targetId);
+};
+const resetList = () => {
+    items.value = [];
 };
 
 //cuenta bancaria
@@ -75,16 +78,13 @@ const selectAccGroup = (key) => {
     } else {
         cuentasDisponibles.value = cuentasBancarias.value[key].original;
     }
-    //console.log(cuentasBancarias.value[key].original) //[key].original, 'key: ', value)
 };
 
 const submit = () => {
     console.log("datos a enviar: ", items.value);
     try {
         axios
-            .post("/api/registrar_orden_de_pago", {items: items.value})
-                //cuenta_bancaria: selectedAccount.value,
-            //})
+            .post("/api/registrar_orden_de_pago", { items: items.value })
             .then((response) => {
                 console.log("resultado de la respuesta: ", response);
             });
@@ -126,7 +126,11 @@ const submit = () => {
                     ></v-switch
                 ></v-container>
             </v-col>
-            <v-col md="3" align-self="center" >{{ validateForm ? 'Las validaciones estan activas' : 'validaciones desactivadas' }}</v-col>
+            <v-col md="3" align-self="center">{{
+                validateForm
+                    ? "Las validaciones estan activas"
+                    : "validaciones desactivadas"
+            }}</v-col>
         </v-row>
 
         <v-divider :thickness="7">Datos de la cuenta</v-divider>
@@ -141,7 +145,7 @@ const submit = () => {
             </v-col>
         </v-row>
         <v-row class="m-2">
-            <!-- <v-col cols="2"></v-col> -->
+            <!-- <v-col cols="2"></v-col> https://cdn.vuetifyjs.com/images/parallax/material.jpg-->
 
             <v-row align-content="center">
                 <v-container fluid>
@@ -149,27 +153,28 @@ const submit = () => {
                         :width="300"
                         aspect-ratio="16/9"
                         cover
-                        src="https://cdn.vuetifyjs.com/images/parallax/material.jpg"
+                        :src="'/img/logo_' + company + '.png'"
                     ></v-img>
                 </v-container>
             </v-row>
             <v-col cols="2">
                 <v-col cols="12" class="text-center p-2">
-                    <v-btn color="primary" @click="selectAccGroup('naviarca')"
-                        >Naviarca</v-btn
+                    <v-btn
+                        @click="selectAccGroup('naviarca')"
+                        :class="{ selected: company == 'naviarca' }"
                     >
+                        Naviarca
+                    </v-btn>
                 </v-col>
                 <v-col cols="12" class="text-center p-2">
-                    <v-btn
-                        color="primary"
-                        @click="selectAccGroup('granCacique')"
+                    <v-btn @click="selectAccGroup('granCacique')"
+                    :class="{ selected: company == 'granCacique' }"
                         >Gran cacique</v-btn
                     >
                 </v-col>
                 <v-col cols="12" class="text-center p-2">
-                    <v-btn
-                        color="primary"
-                        @click="selectAccGroup('serviencomiendas')"
+                    <v-btn @click="selectAccGroup('serviencomiendas')"
+                    :class="{ selected: company == 'serviencomiendas' }"
                         >Serviencomiendas</v-btn
                     >
                 </v-col>
@@ -185,7 +190,11 @@ const submit = () => {
 
             <!-- <v-col cols="2"></v-col> -->
         </v-row>
-        <Formulario @addToList="addToList" @submit="submit" :validateForm = "validateForm" />
+        <Formulario
+            @addToList="addToList"
+            @submit="submit"
+            :validateForm="validateForm"
+        />
 
         <v-table height="300px" fixed-header>
             <thead>
@@ -201,3 +210,15 @@ const submit = () => {
         </v-table>
     </Navbar>
 </template>
+<style scooped>
+/* button.v-btn[disabled] {
+  opacity: 1;
+}*/
+
+button.v-btn.selected {
+    opacity: 1;
+    border: 2px solid #add8e6; /* Light blue color */
+    transition: all 0.3s ease;
+}
+
+</style>
