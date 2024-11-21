@@ -3,24 +3,10 @@
     <v-divider :thickness="7">Datos de la orden de pago</v-divider>
     <v-form class="p-2" @submit.prevent>
         <v-row align="center">
-            <v-col cols="1"></v-col>
-            <v-col cols="2" class="items-centrer justify-center mb-4">
-                <input
-                    id
-                    type="date"
-                    class="custom-datepicker m-2 w-full"
-                    v-model="ordenDePagoElectronico.fecha"
-                />
-            </v-col>
+            <v-col cols="2"></v-col>
 
-            <v-col cols="2">
-                <v-select
-                    v-model="ordenDePagoElectronico.tipo"
-                    :items="['Proveedores', 'Electronico']"
-                    label="Tipo de orden"
-                >
-                </v-select>
-            </v-col>
+
+
             <!--             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
@@ -137,8 +123,8 @@ const emit = defineEmits(["addToList", "submit"]);
 const props = defineProps(["validateForm"]);
 
 var ordenDePagoElectronico = ref({
-    fecha: "",
-    tipo: "",
+    //fecha: "", datos ahora fuera del formulario
+    //tipo: "",
     //referencia: "",
     beneficiario: "",
     factura: "",
@@ -179,13 +165,10 @@ const validateForm = (item) => {
 
 const resetForm = () => {
     ordenDePagoElectronico.value = {
-        fecha: "",
-        tipo: "",
-        //referencia: "",
         beneficiario: "",
         factura: "",
         monto_total: "",
-        //
+        // 
         retencion_islr: "",
         autorizacion: "",
         concepto: "",

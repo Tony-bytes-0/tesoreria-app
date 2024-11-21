@@ -39,7 +39,7 @@ class OrdenDePagoController extends Controller
             'items.*.autorizacion' => 'required|string',
             'items.*.transferencia' => 'required|numeric',
             'items.*.comision_bancaria' => 'required|numeric',
-            'items.*.concepto' => 'string',
+            'items.*.concepto' => '',
             'items.*.banco_nombre' => 'required|string',
             'items.*.codigo_cuenta' => 'required|string',
             'items.*.tipo_cuenta' => 'required|string',

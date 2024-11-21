@@ -1,11 +1,11 @@
 <script setup>
-import { staticError } from "@/Components/alerts/staticMessages";
+import { staticError, staticSucces } from "@/Components/alerts/staticMessages";
 import Formulario from "@/Components/ordenes de pago/Formulario.vue";
 import ItemOnList from "@/Components/ordenes de pago/ItemOnList.vue";
 import TableheadThs from "@/Components/ordenes de pago/TableheadThs.vue";
 import Navbar from "@/Layouts/Navbar.vue";
 import axios from "axios";
-import { ref, defineProps } from "vue";
+import { ref, defineProps, computed } from "vue";
 
 const validateForm = ref(true);
 const props = defineProps(["cuentasNaviarca", "cuentasGc", "tasas"]);
@@ -31,8 +31,10 @@ const addToList = (newItem) => {
             banco_nombre: selectedAccount.value.banco_nombre,
             codigo_cuenta: selectedAccount.value.codigo_cuenta,
             tipo_cuenta: selectedAccount.value.tipo_cuenta,
-            numero_orden_de_pago: "0",
-            rif: "08005604-3",
+            numero_orden_de_pago: "0", //estatico
+            rif: "08005604-3", //estatico!
+            tipo: tipo.value,
+            fecha: fecha.value,
         };
         items.value.push(newItem);
     }
@@ -40,10 +42,7 @@ const addToList = (newItem) => {
 const deleteItem = (targetId) => {
     items.value = items.value.filter((x) => x.id !== targetId);
 };
-const resetList = () => {
-    items.value = [];
-};
-
+//elementos que se repiten en cada registro
 //cuenta bancaria
 var company = ref("Naviarca");
 var selectedAccount = ref({
@@ -53,6 +52,8 @@ var selectedAccount = ref({
     tipo_cuenta: "",
     banco_nombre: "",
 });
+const tipo = ref("");
+const fecha = ref("");
 
 const accProps = (item) => {
     return {
@@ -90,15 +91,27 @@ const selectAccGroup = (key) => {
     }
 };
 
-const submit = () => {
+const sumMontoTotal = computed(() => {
+    let total = 0;
+    if (items.value.length > 0) {
+        items.value.forEach((x) => {
+            total += +x.monto_total;
+        });
+    }
+    return total;
+});
+
+const submit = async () => {
     console.log("datos a enviar: ", items.value);
     try {
-        axios
+        const response = await axios
             .post("/api/registrar_orden_de_pago", { items: items.value })
             .then((response) => {
-                console.log("resultado de la respuesta: ", response);
+                staticSucces("Guardado con éxito");
+                items.value = [];
             });
     } catch (error) {
+        staticError("Codigo de error: " + error.status);
         console.log("ocurrio un error desconocido: ", error);
     }
 };
@@ -117,7 +130,10 @@ const submit = () => {
                 </v-card>
             </v-col>
         </v-row>
-        <v-row dense class=" ml-20 mr-20">
+        <v-row dense class="ml-20 mr-20">
+            <v-col md="3" align-self="center"
+                >Monto total a cancelar: {{ sumMontoTotal }}</v-col
+            >
             <v-row v-if="editandoTasa">
                 <v-col md="3">
                     <v-text-field
@@ -134,11 +150,16 @@ const submit = () => {
 
             <v-col md="3" align-self="center" v-else>
                 Tasa de cambio $: {{ tasaUsd }}
-                <v-btn class="p-2 ml-2" @click="editandoTasa = !editandoTasa">
+                <v-btn
+                    class="p-2 ml-2"
+                    @click="editandoTasa = !editandoTasa"
+                    :disabled="items.length > 0"
+                >
                     cambiar</v-btn
                 ></v-col
             >
-            <v-col md="3" align-self="center">
+
+            <v-col md="2" align-self="center">
                 <v-container>
                     <v-switch
                         v-model="validateForm"
@@ -146,18 +167,14 @@ const submit = () => {
                     ></v-switch
                 ></v-container>
             </v-col>
-            <v-col md="3" align-self="center">{{
-                validateForm
-                    ? "Las validaciones estan activas"
-                    : "validaciones desactivadas"
+            <v-col md="1" align-self="center">{{
+                validateForm ? "validar" : "NO validar"
             }}</v-col>
         </v-row>
 
         <v-divider :thickness="7">Datos de la cuenta</v-divider>
 
         <v-row class="m-2">
-            <!-- <v-col cols="2"></v-col> https://cdn.vuetifyjs.com/images/parallax/material.jpg-->
-
             <v-row align-content="center">
                 <v-container fluid>
                     <v-img
@@ -173,6 +190,7 @@ const submit = () => {
                     <v-btn
                         @click="selectAccGroup('naviarca')"
                         :class="{ selected: company == 'naviarca' }"
+                        :disabled="items.length > 0"
                     >
                         Naviarca
                     </v-btn>
@@ -181,6 +199,7 @@ const submit = () => {
                     <v-btn
                         @click="selectAccGroup('granCacique')"
                         :class="{ selected: company == 'granCacique' }"
+                        :disabled="items.length > 0"
                         >Gran cacique</v-btn
                     >
                 </v-col>
@@ -188,20 +207,47 @@ const submit = () => {
                     <v-btn
                         @click="selectAccGroup('serviencomiendas')"
                         :class="{ selected: company == 'serviencomiendas' }"
+                        :disabled="items.length > 0"
                         >Serviencomiendas</v-btn
                     >
                 </v-col>
             </v-col>
-            <v-col cols="7" align-self="end">
-                <v-select
-                    v-model="selectedAccount"
-                    :items="cuentasDisponibles"
-                    :item-props="accProps"
-                    label="Cuenta bancaria"
-                ></v-select>
-            </v-col>
+            <v-row>
+                <v-col cols="12" align-self="end">
+                    <v-select
+                        v-model="selectedAccount"
+                        :items="cuentasDisponibles"
+                        :item-props="accProps"
+                        label="Cuenta bancaria"
+                        :disabled="items.length > 0"
+                    ></v-select>
+                </v-col>
+                <v-col cols="6">
+                    <v-select
+                        v-model="tipo"
+                        :items="['Proveedores', 'Electronico']"
+                        label="Tipo de orden"
+                        :disabled="items.length > 0"
+                    >
+                    </v-select>
+                </v-col>
+                <v-col cols="6" class="items-centrer justify-center mb-4">
+                    <input
+                        id
+                        type="date"
+                        class="custom-datepicker m-2 w-full"
+                        v-model="fecha"
+                        :disabled="items.length > 0"
+                    />
+                </v-col>
+            </v-row>
 
             <!-- <v-col cols="2"></v-col> -->
+        </v-row>
+        <v-row>
+            <v-col cols="3"></v-col>
+
+            <v-col cols="3"></v-col>
         </v-row>
         <Formulario
             @addToList="addToList"
@@ -224,10 +270,6 @@ const submit = () => {
     </Navbar>
 </template>
 <style scooped>
-/* button.v-btn[disabled] {
-  opacity: 1;
-}*/
-
 button.v-btn.selected {
     opacity: 1;
     border: 2px solid #add8e6; /* Light blue color */

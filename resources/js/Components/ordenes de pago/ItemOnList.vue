@@ -1,5 +1,4 @@
 <template>
-    <td class="text-center">{{ item.tipo }}</td>
     <!-- <td class="text-center">{{ item.referencia }}</td> -->
     <td class="text-center">{{ item.beneficiario }}</td>
     <td class="text-center">{{ item.factura }}</td>
@@ -9,7 +8,6 @@
     <td class="text-center">{{ item.transferencia }}</td>
     <td class="text-center">{{ item.comision_bancaria }}</td>
     <td class="text-center">{{ item.concepto }}</td>
-    <td class="text-center">{{ item.fecha }}</td>
     <!-- Debug -->
     <td class="text-center">
         <v-btn
