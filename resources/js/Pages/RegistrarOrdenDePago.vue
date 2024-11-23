@@ -8,7 +8,7 @@ import axios from "axios";
 import { ref, defineProps, computed } from "vue";
 
 const validateForm = ref(true);
-const props = defineProps(["cuentasNaviarca", "cuentasGc", "tasas"]);
+const props = defineProps(["cuentasNaviarca", "cuentasGc", "tasas", "beneficiarios"]);
 const cuentasBancarias = ref({
     naviarca: props.cuentasNaviarca,
     granCacique: props.cuentasGc,
@@ -35,6 +35,7 @@ const addToList = (newItem) => {
             rif: "08005604-3", //estatico!
             tipo: tipo.value,
             fecha: fecha.value,
+            tasa: tasaUsd.value
         };
         items.value.push(newItem);
     }
@@ -231,9 +232,9 @@ const submit = async () => {
                     >
                     </v-select>
                 </v-col>
+                
                 <v-col cols="6" class="items-centrer justify-center mb-4">
                     <input
-                        id
                         type="date"
                         class="custom-datepicker m-2 w-full"
                         v-model="fecha"
@@ -253,6 +254,7 @@ const submit = async () => {
             @addToList="addToList"
             @submit="submit"
             :validateForm="validateForm"
+            :beneficiarios="props.beneficiarios"
         />
 
         <v-table height="300px" fixed-header>
@@ -274,5 +276,8 @@ button.v-btn.selected {
     opacity: 1;
     border: 2px solid #add8e6; /* Light blue color */
     transition: all 0.3s ease;
+}
+.custom-datepicker input{
+    background-color: #3D3D3D;
 }
 </style>

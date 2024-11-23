@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OrdenDePagoElectronico extends Model
 {
@@ -24,6 +25,11 @@ class OrdenDePagoElectronico extends Model
         'tipo_cuenta',
         'beneficiario',
         'concepto',
-        'numero_orden_de_pago'
+        'id_beneficiario'
     ];
+
+    public function id_beneficiario()
+    {
+        return $this->hasMany(Beneficiario_cuentas::class);
+    }
 }

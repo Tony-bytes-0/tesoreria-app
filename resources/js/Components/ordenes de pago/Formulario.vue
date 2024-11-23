@@ -5,22 +5,35 @@
         <v-row align="center">
             <v-col cols="2"></v-col>
 
+             <v-col cols="12">
+                <h1>
+                    content of beneficiario
+                    {{ id_beneficiario}}
+                </h1>
+            </v-col> 
 
-
-            <!--             <v-col cols="2">
-                <v-text-field
-                    class="custom-dark"
-                    v-model="ordenDePagoElectronico.referencia"
-                    label="Numero de referencia"
-                ></v-text-field>
-            </v-col> -->
-
-            <v-col cols="2">
-                <v-text-field
-                    class="custom-dark"
+            <v-col cols="4">
+                <v-autocomplete
+                    label="Beneficiario"
                     v-model="ordenDePagoElectronico.beneficiario"
-                    label="Nombre del beneficiario"
-                ></v-text-field>
+                    item-title="descripcion"
+                    item-value="descripcion"
+                    :items="props.beneficiarios"
+                    return-object
+                >
+                    <template v-slot:item="{ props, item }">
+                        <v-list-item
+                            v-bind="props"
+                            :title="item.raw.descripcion"
+                            :text="item.raw.descripcion"
+                            :subtitle="
+                                item.raw.rif +
+                                ' cuenta: ' +
+                                item.raw.codigo_cuenta
+                            "
+                        ></v-list-item>
+                    </template>
+                </v-autocomplete>
             </v-col>
 
             <v-col cols="2">
@@ -120,8 +133,8 @@ import "vuetify";
 import { staticError } from "../alerts/staticMessages";
 
 const emit = defineEmits(["addToList", "submit"]);
-const props = defineProps(["validateForm"]);
-
+const props = defineProps(["validateForm", "beneficiarios"]);
+console.log("beneficiarios en las props: ", props.beneficiarios);
 var ordenDePagoElectronico = ref({
     //fecha: "", datos ahora fuera del formulario
     //tipo: "",
@@ -135,22 +148,23 @@ var ordenDePagoElectronico = ref({
     concepto: "",
 });
 
+const id_beneficiario = computed(() => {
+    return ordenDePagoElectronico.value.beneficiario.id
+})
+
 const transferencia = computed(() => {
     const newValue = parseFloat(
         ordenDePagoElectronico.value.monto_total -
             ordenDePagoElectronico.value.retencion_islr
     );
-    return (
-        Number(newValue.toFixed(2))
-    );
+    return Number(newValue.toFixed(2));
 });
 
 const comision_bancaria = computed(() => {
     const newValue = parseFloat(
         0.0025 * ordenDePagoElectronico.value.monto_total.toString()
     );
-    return Number(newValue.toFixed(2))
-    
+    return Number(newValue.toFixed(2));
 });
 
 const validateForm = (item) => {
@@ -168,7 +182,7 @@ const resetForm = () => {
         beneficiario: "",
         factura: "",
         monto_total: "",
-        // 
+        //
         retencion_islr: "",
         autorizacion: "",
         concepto: "",
@@ -186,6 +200,7 @@ const handleAddToList = () => {
             ...ordenDePagoElectronico.value,
             transferencia: transferencia.value,
             comision_bancaria: comision_bancaria.value,
+            id_beneficiario: id_beneficiario.value
         });
         resetForm();
     }
@@ -195,10 +210,33 @@ const submit = () => {
     console.log("formualario: ", ordenDePagoElectronico.value);
     emit("submit", { ...ordenDePagoElectronico.value });
 };
-onMounted(() => {
-    //const actualDate = new Date().toJSON().slice(0, 10);
-    //ordenDePagoElectronico.value.fecha = actualDate;
-});
+//autocomplete component
+
+const accProps = (item) => {
+    return {
+        title: "example of title", // + " - " + item.codigo_cuenta,
+        subtitle: "subtitle",
+    };
+};
+const srcs = {
+    1: "https://cdn.vuetifyjs.com/images/lists/1.jpg",
+    2: "https://cdn.vuetifyjs.com/images/lists/2.jpg",
+    3: "https://cdn.vuetifyjs.com/images/lists/3.jpg",
+    4: "https://cdn.vuetifyjs.com/images/lists/4.jpg",
+    5: "https://cdn.vuetifyjs.com/images/lists/5.jpg",
+};
+const people = ref([
+    { name: "Sandra Adams", group: "Group 1", avatar: srcs[1] },
+    { name: "Ali Connors", group: "Group 1", avatar: srcs[2] },
+    { name: "Trevor Hansen", group: "Group 1", avatar: srcs[3] },
+    { name: "Tucker Smith", group: "Group 1", avatar: srcs[2] },
+    // { divider: true },
+    // { header: 'Group 2' },
+    { name: "Britta Holt", group: "Group 2", avatar: srcs[4] },
+    { name: "Jane Smith ", group: "Group 2", avatar: srcs[5] },
+    { name: "John Smith", group: "Group 2", avatar: srcs[1] },
+    { name: "Sandra Williams", group: "Group 2", avatar: srcs[3] },
+]);
 </script>
 
 <style scooped>
@@ -211,7 +249,8 @@ onMounted(() => {
     background-color: black !important;
 }
 .custom-dark input {
-    color: black !important;
+    color: white !important;
+    background-color: #3d3d3d;
 }
 .custom-dark {
     color: gray !important;
@@ -219,5 +258,27 @@ onMounted(() => {
 .custom-datepicker {
     color: black;
     margin: 20px;
+}
+.v-autocomplete input {
+    --v-input-font-color: rgba(0, 0, 0, 0.87);
+    /*--v-input-group-adaptive-elevation: 2px;*/
+    background-color: #3d3d3d;
+    border-color: inherit;
+    border: 0cm;
+    margin: 0;
+    padding: 0;
+    size: 1;
+    height: 100%;
+    width: 100%;
+}
+.v-autocomplete div {
+    /*background-color:#3CBC8D;*/
+    padding: 0px;
+}
+input {
+    background-color: #3cbc8d;
+}
+#input- {
+    background-color: #3cbc8d;
 }
 </style>
