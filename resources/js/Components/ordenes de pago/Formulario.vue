@@ -5,13 +5,6 @@
         <v-row align="center">
             <v-col cols="2"></v-col>
 
-             <v-col cols="12">
-                <h1>
-                    content of beneficiario
-                    {{ id_beneficiario}}
-                </h1>
-            </v-col> 
-
             <v-col cols="4">
                 <v-autocomplete
                     label="Beneficiario"
@@ -170,6 +163,7 @@ const comision_bancaria = computed(() => {
 const validateForm = (item) => {
     var validationObject = Object.assign({}, item);
     delete validationObject.concepto; //propiedad no validable
+    delete validationObject.retencion_islr; //propiedad no validable
 
     const notEmpty = (x) => {
         return x.length == 0;

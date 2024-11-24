@@ -8,6 +8,7 @@ use App\Http\Controllers\Tasa;
 use App\Models\Beneficiario_cuentas;
 use App\Models\OrdenDePagoElectronico;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 
@@ -56,10 +57,15 @@ class OrdenDePagoController extends Controller
             'items.*.concepto' => '',
 
         ]);
-        //dd($validatedData);
         $ordenDePagos = collect($validatedData["items"])->map(function ($item) {
             return OrdenDePagoElectronico::create($item);
         });
+        //dd($ordenDePagos);
+/*         DB::transaction(function() {
+
+            dd($ordenDePagos);
+        }); */
+
 
         return response()->json([
             'message' => 'Ordenes de pago electrónicas registradas exitosamente.',

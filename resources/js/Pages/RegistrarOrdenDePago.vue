@@ -3,6 +3,7 @@ import { staticError, staticSucces } from "@/Components/alerts/staticMessages";
 import Formulario from "@/Components/ordenes de pago/Formulario.vue";
 import ItemOnList from "@/Components/ordenes de pago/ItemOnList.vue";
 import TableheadThs from "@/Components/ordenes de pago/TableheadThs.vue";
+import { Currency } from "@/helpers/currency";
 import Navbar from "@/Layouts/Navbar.vue";
 import axios from "axios";
 import { ref, defineProps, computed } from "vue";
@@ -99,7 +100,7 @@ const sumMontoTotal = computed(() => {
             total += +x.monto_total;
         });
     }
-    return total;
+    return parseFloat(total).toFixed(2);
 });
 
 const submit = async () => {
@@ -133,7 +134,7 @@ const submit = async () => {
         </v-row>
         <v-row dense class="ml-20 mr-20">
             <v-col md="3" align-self="center"
-                >Monto total a cancelar: {{ sumMontoTotal }}</v-col
+                >Monto total a cancelar: {{ sumMontoTotal + ' VED' }}</v-col
             >
             <v-row v-if="editandoTasa">
                 <v-col md="3">
@@ -150,7 +151,7 @@ const submit = async () => {
             </v-row>
 
             <v-col md="3" align-self="center" v-else>
-                Tasa de cambio $: {{ tasaUsd }}
+                Tasa de cambio $: {{ tasaUsd }} VED
                 <v-btn
                     class="p-2 ml-2"
                     @click="editandoTasa = !editandoTasa"
