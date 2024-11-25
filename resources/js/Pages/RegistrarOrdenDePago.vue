@@ -100,7 +100,7 @@ const sumMontoTotal = computed(() => {
             total += +x.monto_total;
         });
     }
-    return parseFloat(total).toFixed(2);
+    return parseFloat(total).toLocaleString('es-MX');
 });
 
 const submit = async () => {
@@ -109,7 +109,7 @@ const submit = async () => {
         const response = await axios
             .post("/api/registrar_orden_de_pago", { items: items.value })
             .then((response) => {
-                staticSucces("Guardado con éxito");
+                staticSucces("Guardado con éxito, Numero de orden: " + response.data.numero_orden_de_pago);
                 items.value = [];
             });
     } catch (error) {

@@ -26,7 +26,8 @@ class OrdenDePagoElectronico extends Model
         'beneficiario',
         'concepto',
         'id_beneficiario',
-        'tasa'
+        'tasa',
+        'numero_orden_de_pago',
     ];
 
     public function id_beneficiario()
@@ -35,6 +36,6 @@ class OrdenDePagoElectronico extends Model
     }
     public function referencia_proceso_orden_de_pago()
     {
-        return $this->belongsTo(ProcesoOrdenDePago::class);
+        return $this->hasMany(ProcesoOrdenDePago::class);
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\CuentasBancariasController;
 use App\Http\Controllers\Tasa;
 use App\Models\Beneficiario_cuentas;
 use App\Models\OrdenDePagoElectronico;
+use App\Models\ProcesoOrdenDePago;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -45,7 +46,6 @@ class OrdenDePagoController extends Controller
             'items.*.banco_nombre' => 'required|string',
             'items.*.codigo_cuenta' => 'required|string',
             'items.*.tipo_cuenta' => 'string',
-            'items.*.numero_orden_de_pago' => '',
             //'items.*.beneficiario' => '',
             'items.*.id_beneficiario' => 'required|numeric',
             'items.*.factura' => 'required|string',
@@ -55,22 +55,38 @@ class OrdenDePagoController extends Controller
             'items.*.transferencia' => 'required|numeric',
             'items.*.comision_bancaria' => 'required|numeric',
             'items.*.concepto' => '',
-
         ]);
-        $ordenDePagos = collect($validatedData["items"])->map(function ($item) {
-            return OrdenDePagoElectronico::create($item);
+
+        $lastEntry = OrdenDePagoElectronico::orderBy('numero_orden_de_pago', 'DESC')->first(); //buscar ultimo id existente, añadir uno
+        $lastOrderNumber = $lastEntry->numero_orden_de_pago + 1;
+
+        $transactionResult = DB::transaction(function () use ($lastOrderNumber, $validatedData) {
+
+            $totalSum = 0;
+            foreach ($validatedData['items'] as $value) {
+                if (isset($value['transferencia']) && is_numeric($value['transferencia'])) {
+                    $totalSum += $value['transferencia'];
+                } else {
+                    //
+                }
+            }
+            $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'concepto' => '','numero_orden_de_pago' => $lastOrderNumber ]);
+
+            $ordenDePagos = collect($validatedData["items"])->map(function ($item) use ($lastOrderNumber) {
+                $item['numero_orden_de_pago'] = $lastOrderNumber;
+                //dd($item);
+                return OrdenDePagoElectronico::create($item);
+            });
+
+            return ['orden_de_pagos' => $ordenDePagos, 'proceso_ordenes' => $procesoOrdenes];
         });
-        //dd($ordenDePagos);
-/*         DB::transaction(function() {
-
-            dd($ordenDePagos);
-        }); */
-
+        //dd($lastOrderNumber);
 
         return response()->json([
             'message' => 'Ordenes de pago electrónicas registradas exitosamente.',
-            'num_records_saved' => count($ordenDePagos),
-            'saved_records' => $ordenDePagos,
+            'num_records_saved' => count($transactionResult['orden_de_pagos']),
+            'saved_records' => $transactionResult['orden_de_pagos'],
+            'numero_orden_de_pago' => $lastOrderNumber
         ], 201);
     }
 }

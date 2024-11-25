@@ -30,18 +30,18 @@ const props = defineProps(["item"]);
 const emit = defineEmits(['deleteItem'])
 
 const computedMontoTotal = computed(() => {
-    return parseFloat(props.item.monto_total).toFixed(2)
+    return parseFloat(props.item.monto_total).toLocaleString('es-MX')
 })
 
 const computedRetencion = computed(() => {
     if(props.item.retencion_islr){
-        return parseFloat(props.item.retencion_islr).toFixed(2)
+        return parseFloat(props.item.retencion_islr).toLocaleString('es-MX')
     }else return 0;
 })
 
 const computedComision = computed(() => {
     if(props.item.comision_bancaria){
-        return parseFloat(props.item.comision_bancaria).toFixed(2)
+        return parseFloat(props.item.comision_bancaria).toLocaleString('es-MX')
     }else return 0;
 })
 

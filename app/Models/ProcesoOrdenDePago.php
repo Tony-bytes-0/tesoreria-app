@@ -6,11 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProcesoOrdenDePago extends Model
 {
-    protected $filleable = [
-        'total','numero_orden_de_pago','concepto'
+    protected $fillable = [
+        'total',
+        //'numero_orden_de_pago',
+        'concepto',
+        'numero_orden_de_pago',
     ];
     public function numero_orden_de_pago()
     {
-        return $this->hasMany(OrdenDePagoElectronico::class);
+        return $this->belongsTo(OrdenDePagoElectronico::class);
     }
 }
