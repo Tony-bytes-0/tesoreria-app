@@ -70,7 +70,7 @@ class OrdenDePagoController extends Controller
                     //
                 }
             }
-            $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'concepto' => '','numero_orden_de_pago' => $lastOrderNumber ]);
+            $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'numero_orden_de_pago' => $lastOrderNumber ]);
 
             $ordenDePagos = collect($validatedData["items"])->map(function ($item) use ($lastOrderNumber) {
                 $item['numero_orden_de_pago'] = $lastOrderNumber;

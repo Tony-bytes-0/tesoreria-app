@@ -20,9 +20,6 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-/* Route::get('RegistrarOrdenDePago', function () {
-    return Inertia::render('RegistrarOrdenDePago');
-})->middleware(['auth', 'verified'])->name('RegistrarOrdenDePago'); */
 route::get('RegistrarOrdenDePago', [OrdenDePagoController::class, 'viewWithApiData'])->middleware(['auth', 'verified']);
 
 Route::middleware('auth')->group(function () {
