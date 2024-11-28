@@ -15,7 +15,7 @@ use Inertia\Inertia;
 
 class OrdenDePagoController extends Controller
 {
-    public function viewWithApiData()
+    public function viewRegistrarOrdenDePago()
     {
         //$cuentas_bancarias = CuentasBancariasController::consultar_cuentas_bancarias(); //llamada estatica, error //instanciar objeto, luego llamar sus metodos
         $cuentas = new CuentasBancariasController;
@@ -57,9 +57,6 @@ class OrdenDePagoController extends Controller
             'items.*.concepto' => '',
         ]);
 
-        //$lastEntry = OrdenDePagoElectronico::orderBy('numero_orden_de_pago', 'DESC')->first(); //buscar ultimo id existente, añadir uno
-        //$lastOrderNumber = $lastEntry->numero_orden_de_pago + 1;
-
         $transactionResult = DB::transaction(function () use ($validatedData) {
 
             $totalSum = 0;
@@ -74,14 +71,12 @@ class OrdenDePagoController extends Controller
 
 
             $ordenDePagos = collect($validatedData["items"])->map(function ($item) use($procesoOrdenes)  {
-                //$item['numero_orden_de_pago'] = $lastOrderNumber;
                 $item['id_proceso'] = $procesoOrdenes['id'];
                 return OrdenDePagoElectronico::create($item);
             });
 
             return ['orden_de_pagos' => $ordenDePagos, 'proceso_ordenes' => $procesoOrdenes];
         });
-        //dd($transactionResult['proceso_ordenes']['id']);
 
         return response()->json([
             'message' => 'Ordenes de pago electrónicas registradas exitosamente.',

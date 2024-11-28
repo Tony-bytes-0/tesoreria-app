@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\CuentasBancariasController;
 use App\Http\Controllers\OrdenDePagoController;
+use App\Http\Controllers\ReportesTesoreria;
 use App\Http\Controllers\Tasa;
 use Illuminate\Support\Facades\Route;
 
@@ -14,4 +15,8 @@ Route::get('/consultar_cuentas_bancarias', [CuentasBancariasController::class, '
 Route::post('/registrar_orden_de_pago', [OrdenDePagoController::class, 'registrar']);
 
 Route::get('/tasa', [Tasa::class, 'consultar_tasa']);
+
+//reportes
+
+Route::get('/consultar_ordenes_de_pago', [ReportesTesoreria::class, '']);
 

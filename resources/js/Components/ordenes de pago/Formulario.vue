@@ -127,7 +127,6 @@ import { staticError } from "../alerts/staticMessages";
 
 const emit = defineEmits(["addToList", "submit"]);
 const props = defineProps(["validateForm", "beneficiarios"]);
-console.log("beneficiarios en las props: ", props.beneficiarios);
 var ordenDePagoElectronico = ref({
     //fecha: "", datos ahora fuera del formulario
     //tipo: "",

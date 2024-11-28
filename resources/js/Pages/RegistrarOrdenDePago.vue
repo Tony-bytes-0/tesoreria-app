@@ -3,7 +3,6 @@ import { staticError, staticSucces } from "@/Components/alerts/staticMessages";
 import Formulario from "@/Components/ordenes de pago/Formulario.vue";
 import ItemOnList from "@/Components/ordenes de pago/ItemOnList.vue";
 import TableheadThs from "@/Components/ordenes de pago/TableheadThs.vue";
-import { Currency } from "@/helpers/currency";
 import Navbar from "@/Layouts/Navbar.vue";
 import axios from "axios";
 import { ref, defineProps, computed } from "vue";

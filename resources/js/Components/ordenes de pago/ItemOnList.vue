@@ -3,7 +3,6 @@
      <td class="text-center">{{ item.beneficiario.rif }}</td>
     <td class="text-center">{{ item.beneficiario.descripcion }}</td>
     <td class="text-center">{{ item.beneficiario.codigo_cuenta }}</td>
-    
     <td class="text-center">{{ item.factura }}</td>
     <td class="text-center">{{ computedMontoTotal }}</td>
     <td class="text-center">{{ computedRetencion }}</td>

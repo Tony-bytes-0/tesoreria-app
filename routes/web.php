@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrdenDePagoController;
+use App\Http\Controllers\ReportesTesoreria;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,7 +21,8 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-route::get('RegistrarOrdenDePago', [OrdenDePagoController::class, 'viewWithApiData'])->middleware(['auth', 'verified']);
+route::get('RegistrarOrdenDePago', [OrdenDePagoController::class, 'viewRegistrarOrdenDePago'])->middleware(['auth', 'verified']);
+route::get('OrdenesDePago' ,[ReportesTesoreria::class, 'viewConsultarOrdenesDePago' ]);//[OrdenDePagoController::class, 'viewWithApiData'])->middleware(['auth', 'verified']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

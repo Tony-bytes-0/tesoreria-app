@@ -78,7 +78,7 @@ function alterTheme() {
 const drawer = ref(false);
 const menuIconPath = ref(mdiMenu);
 const items = [
-    { title: "Ordenes de pago", value: "foo", href: "#" },
+    { title: "Ordenes de pago", value: "foo", href: "/OrdenesDePago" },
     {
         title: "Registrar orden de pago",
         value: "bar",
