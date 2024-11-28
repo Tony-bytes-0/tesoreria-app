@@ -25,16 +25,17 @@ class OrdenDePagoElectronico extends Model
         'tipo_cuenta',
         'beneficiario',
         'concepto',
-        'id_beneficiario',
         'tasa',
         'numero_orden_de_pago',
+        'id_beneficiario',
+        'id_proceso',
     ];
 
     public function id_beneficiario()
     {
         return $this->hasMany(Beneficiario_cuentas::class);
     }
-    public function referencia_proceso_orden_de_pago()
+    public function id_proceso()
     {
         return $this->hasMany(ProcesoOrdenDePago::class);
     }

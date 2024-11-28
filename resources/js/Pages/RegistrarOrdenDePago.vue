@@ -100,7 +100,7 @@ const sumMontoTotal = computed(() => {
             total += +x.monto_total;
         });
     }
-    return parseFloat(total).toLocaleString('es-MX');
+    return parseFloat(total).toLocaleString('es-CO');
 });
 
 const submit = async () => {
@@ -134,7 +134,7 @@ const submit = async () => {
         </v-row>
         <v-row dense class="ml-20 mr-20">
             <v-col md="3" align-self="center"
-                >Monto total a cancelar: {{ sumMontoTotal + ' VED' }}</v-col
+                >Monto total a cancelar: {{ sumMontoTotal + ' Bs.' }}</v-col
             >
             <v-row v-if="editandoTasa">
                 <v-col md="3">
@@ -151,7 +151,7 @@ const submit = async () => {
             </v-row>
 
             <v-col md="3" align-self="center" v-else>
-                Tasa de cambio $: {{ tasaUsd }} VED
+                Tasa de cambio $: {{ tasaUsd.toLocaleString('es-CO') }} Bs.
                 <v-btn
                     class="p-2 ml-2"
                     @click="editandoTasa = !editandoTasa"

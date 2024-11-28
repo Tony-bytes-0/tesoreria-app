@@ -12,7 +12,7 @@ class ProcesoOrdenDePago extends Model
         'concepto',
         'numero_orden_de_pago',
     ];
-    public function numero_orden_de_pago()
+    public function id_proceso()
     {
         return $this->belongsTo(OrdenDePagoElectronico::class);
     }

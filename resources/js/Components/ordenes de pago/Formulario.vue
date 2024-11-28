@@ -33,7 +33,7 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.factura"
-                    label="Numero de factura"
+                    label="Número de factura"
                 ></v-text-field>
             </v-col>
 

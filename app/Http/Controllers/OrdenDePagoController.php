@@ -57,10 +57,10 @@ class OrdenDePagoController extends Controller
             'items.*.concepto' => '',
         ]);
 
-        $lastEntry = OrdenDePagoElectronico::orderBy('numero_orden_de_pago', 'DESC')->first(); //buscar ultimo id existente, añadir uno
-        $lastOrderNumber = $lastEntry->numero_orden_de_pago + 1;
+        //$lastEntry = OrdenDePagoElectronico::orderBy('numero_orden_de_pago', 'DESC')->first(); //buscar ultimo id existente, añadir uno
+        //$lastOrderNumber = $lastEntry->numero_orden_de_pago + 1;
 
-        $transactionResult = DB::transaction(function () use ($lastOrderNumber, $validatedData) {
+        $transactionResult = DB::transaction(function () use ($validatedData) {
 
             $totalSum = 0;
             foreach ($validatedData['items'] as $value) {
@@ -70,23 +70,24 @@ class OrdenDePagoController extends Controller
                     //
                 }
             }
-            $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'numero_orden_de_pago' => $lastOrderNumber ]);
+            $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'numero_orden_de_pago' => '1' ]);
 
-            $ordenDePagos = collect($validatedData["items"])->map(function ($item) use ($lastOrderNumber) {
-                $item['numero_orden_de_pago'] = $lastOrderNumber;
-                //dd($item);
+
+            $ordenDePagos = collect($validatedData["items"])->map(function ($item) use($procesoOrdenes)  {
+                //$item['numero_orden_de_pago'] = $lastOrderNumber;
+                $item['id_proceso'] = $procesoOrdenes['id'];
                 return OrdenDePagoElectronico::create($item);
             });
 
             return ['orden_de_pagos' => $ordenDePagos, 'proceso_ordenes' => $procesoOrdenes];
         });
-        //dd($lastOrderNumber);
+        //dd($transactionResult['proceso_ordenes']['id']);
 
         return response()->json([
             'message' => 'Ordenes de pago electrónicas registradas exitosamente.',
             'num_records_saved' => count($transactionResult['orden_de_pagos']),
             'saved_records' => $transactionResult['orden_de_pagos'],
-            'numero_orden_de_pago' => $lastOrderNumber
+            'numero_orden_de_pago' => $transactionResult['proceso_ordenes']['id']
         ], 201);
     }
 }
