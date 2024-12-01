@@ -18,5 +18,5 @@ Route::get('/tasa', [Tasa::class, 'consultar_tasa']);
 
 //reportes
 
-Route::get('/consultar_ordenes_de_pago', [ReportesTesoreria::class, '']);
+Route::get('/consultar_ordenes_de_pago', [ReportesTesoreria::class, 'consultarOrdenesDePago']);
 

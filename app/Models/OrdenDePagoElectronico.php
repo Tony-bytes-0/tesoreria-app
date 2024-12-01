@@ -29,11 +29,12 @@ class OrdenDePagoElectronico extends Model
         'numero_orden_de_pago',
         'id_beneficiario',
         'id_proceso',
+        //'perPage', 'page'
     ];
 
-    public function id_beneficiario()
+    public function beneficiario()
     {
-        return $this->hasMany(Beneficiario_cuentas::class);
+        return $this->hasMany(Beneficiario_cuentas::class, 'id');
     }
     public function id_proceso()
     {
