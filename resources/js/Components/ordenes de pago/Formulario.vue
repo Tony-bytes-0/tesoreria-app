@@ -191,6 +191,7 @@ const handleAddToList = () => {
         );
         emit("addToList", {
             ...ordenDePagoElectronico.value,
+            monto_total: Number(ordenDePagoElectronico.value.monto_total).toFixed(2),
             transferencia: transferencia.value,
             comision_bancaria: comision_bancaria.value,
             id_beneficiario: id_beneficiario.value
