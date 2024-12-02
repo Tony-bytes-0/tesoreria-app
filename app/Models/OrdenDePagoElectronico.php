@@ -29,7 +29,9 @@ class OrdenDePagoElectronico extends Model
         'numero_orden_de_pago',
         'id_beneficiario',
         'id_proceso',
+        'id_cuenta_contable',
         //'perPage', 'page'
+        
     ];
 
     public function beneficiario()
@@ -39,5 +41,8 @@ class OrdenDePagoElectronico extends Model
     public function id_proceso()
     {
         return $this->hasMany(ProcesoOrdenDePago::class);
+    }
+    public function cuenta_contable(){
+        return $this->hasMany( CuentasContable::class, 'id');
     }
 }

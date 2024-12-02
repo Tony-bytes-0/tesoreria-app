@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CuentasContable;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\OrdenDePagoElectronico;
@@ -12,10 +13,10 @@ class ReportesTesoreria extends Controller
 
     public function viewConsultarOrdenesDePago()
     {
-
-        $ordenesArray = OrdenDePagoElectronico::get();
+        //$ordenesArray = OrdenDePagoElectronico::get();
+        $cuentasContables = CuentasContable::get();
         return Inertia::render('reportes tesoreria/OrdenesDePago', [
-            'ordenesDePago' => $ordenesArray
+            'cuentasContables' => $cuentasContables
         ]);
     }
 

@@ -4,18 +4,76 @@
             <h1>Reporte ordenes de pago</h1>
         </div>
         <DateRange @sendDate="sendDate" />
-        <v-data-table-server
+
+        <v-row class="mb-10">
+            <v-col>
+                <v-dialog max-width="500" class="z-10">
+                    <template v-slot:activator="{ props: modal }">
+                        <v-btn
+                            class="bg-blue-600"
+                            v-bind="modal"
+                            text="Editar seleccionados"
+                            variant="flat"
+                        ></v-btn>
+                    </template>
+
+                    <template v-slot:default="{ isActive }">
+                        <v-card title="Editar">
+                            <v-divider>Asignar cuenta contable</v-divider>
+                            <v-row>
+                                <v-col cols="1"></v-col>
+                                <v-col cols="10">
+                                    <h2 class="mb-5 mt-5">
+                                        ( {{ selectedItems.length }} ) registros
+                                        seleccionados
+                                    </h2>
+                                    <v-autocomplete
+                                        v-model="selectedAccount"
+                                        label="Cuenta contable"
+                                        :items="props.cuentasContables"
+                                        item-title="descripcion"
+                                        item-value="descripcion"
+                                        return-object
+                                    >
+                                        <template v-slot:item="{ props, item }">
+                                            <v-list-item
+                                                v-bind="props"
+                                                :subtitle="
+                                                    ' cuenta: ' +
+                                                    item.raw.codigo_cuenta
+                                                "
+                                            ></v-list-item> </template
+                                    ></v-autocomplete>
+                                    <h1>{{ selectedAccount }}</h1>
+                                </v-col>
+                                <v-col cols="1"></v-col>
+                            </v-row>
+                            <v-row class="mb-5">
+                                <v-col cols="1"></v-col>
+                                <v-col cols="10" align-self="center"
+                                    ><v-btn class="bg-green-700" @click="submit"
+                                        >Procesar</v-btn
+                                    ></v-col
+                                >
+                                <v-col cols="1"></v-col>
+                            </v-row>
+                        </v-card>
+                    </template>
+                </v-dialog>
+            </v-col>
+        </v-row>
+        <v-data-table
             class="pagination"
-            v-model:items-per-page="itemsPerPage"
+            v-model="selectedItems"
             :headers="headers"
             :items="serverItems"
-            :items-length="itemsPerPage"
-            :loading="loading"
-            :search="search"
-            :page="page"
-            item-value="name"
-            @update:options="loadItems"
-        ></v-data-table-server>
+            item-value="id"
+            items-per-page="10"
+            return-object
+            show-select
+            hover
+        ></v-data-table>
+        <h1>{{ selectedItems }}</h1>
     </Navbar>
 </template>
 
@@ -26,14 +84,24 @@ import axios from "axios";
 import "vuetify/styles";
 import "vuetify";
 import { computed, onMounted, ref, watch } from "vue";
+import { staticError, staticSucces } from "@/Components/alerts/staticMessages";
 
-const props = defineProps(["ordenesDePago"]);
+const props = defineProps(["ordenesDePago", "cuentasContables"]);
 var date = ref({
     initialDate: "",
     finalDate: "",
 });
 
+var selectedAccount = ref({
+    id: "",
+    codigo_cuenta: "",
+    descripcion: "",
+});
+
+const modal = ref(false)
+
 const sendDate = (targetValue) => {
+    loadItems({ page: 1, itemsPerPage: itemsPerPage.value });
     date.value = targetValue;
     console.log(targetValue);
 };
@@ -53,21 +121,22 @@ const headers = [
     { title: "Comisión bancaria", key: "comision_bancaria", align: "end" },
     { title: "Nº factura", key: "factura", align: "end" },
     { title: "Nº autorización", key: "autorizacion", align: "end" },
+    { title: "Cuenta contable", key: "cuenta_contable", align: "end" },
     { title: "Concepto", key: "concepto", align: "end" },
 ];
-
+//table data datos de la tabla
+const selectedItems = ref([]);
 const search = ref("");
 const serverItems = ref([]);
-const loading = ref(true);
+const loading = ref(false);
+const page = ref(2);
+const itemsPerPage = ref(15);
+//const sortBy = ref([{ key: "name", order: "asc" }]);
+//const sortByDesc = computed(() => sortBy.value[0]?.order === "desc");
 //const totalItems = ref(3);
-const page = ref(1);
-const itemsPerPage = ref(5);
-const sortBy = ref([{ key: "name", order: "asc" }]);
-const sortByDesc = computed(() => sortBy.value[0]?.order === "desc");
 
-function loadItems({ page, itemsPerPage, sortBy }) {
+function loadItems({ page, itemsPerPage }) {
     loading.value = true;
-    //FakeAPI.fetch({ page, itemsPerPage, sortBy }).then(({ items, total }) => {
     axios({
         method: "GET",
         url: "/api/consultar_ordenes_de_pago",
@@ -81,13 +150,9 @@ function loadItems({ page, itemsPerPage, sortBy }) {
     }).then((response) => {
         serverItems.value = response.data.items.data;
     });
-
-    //serverItems.value = items
-    //totalItems.value = total
     loading.value = false;
 }
 
-// Watch for changes in search and update the data accordingly
 watch(search, () => {
     loadItems({
         page: page.value,
@@ -96,28 +161,45 @@ watch(search, () => {
     });
 });
 
-// Watch for changes in pagination and sort options
-/* watch([page, itemsPerPage, sortBy], () => {
-    loadItems({
-        page: page.value,
-        itemsPerPage: itemsPerPage.value,
-        sortBy: sortBy.value,
-    });
-}); */
-onMounted(() => {
-    //serverItems.value = props.ordenesDePago;
-    const buttonContainer = document.getElementsByClassName('v-pagination__list');
-    console.log(buttonContainer);
-    buttonContainer.class = 'paginationButton'
-});
+const submit = async () => {
+    //console.log("datos a enviar: ", items.value);
+    try {
+        const response = await axios
+            .post("/api/asignar_cuenta_contable_a_orden", {
+                idOrdenes: selectedItems.map((e) => e.id),
+                idCuentaContable: selectedAccount.value.id,
+            })
+            .then((response) => {
+                staticSucces("Asignacion exitosa ");
+                selectedAccount.value = {
+                    id: "",
+                    descripcion: "",
+                    codigo_cuenta: "",
+                };
+            });
+    } catch (error) {
+        staticError("Codigo de error: " + error.status);
+    }
+};
 </script>
 
-<style scoped>
-.paginationButton {
+<style>
+.v-selection-control__input > .v-icon {
+    opacity: 50;
+}
+.mdi-checkbox-blank-outline {
     background-color: #f1f1f1;
-    /*
-    border-color: #ff0000;
-    margin: 50px;
-    */
-}   
+    opacity: 50%;
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-radius: 50%;
+}
+.mdi-checkbox-marked {
+    background-color: rgb(145, 255, 102);
+    border-radius: 50%;
+}
+.v-pagination__first {
+    color: #f1f1f1;
+}
 </style>

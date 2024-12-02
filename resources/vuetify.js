@@ -18,7 +18,7 @@ const vuetify = createVuetify({
     theme: {
         themes: {
             light: {
-                dark: false,
+                dark: true,
                 colors: {
                     //Ejemplo de donde personalizar los colores
                     primary: '#E53935',
