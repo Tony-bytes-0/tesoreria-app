@@ -24,3 +24,7 @@ Route::get('/consultar_cuentas_contables', [CuentasContable::class, 'consultar']
 
 Route::get('/consultar_ordenes_de_pago', [ReportesTesoreria::class, 'consultarOrdenesDePago']);
 
+//administrar
+
+Route::post('/asignar_cuenta_contable_a_orden', [OrdenDePagoController::class, 'asignarCuentaContable']);
+

@@ -6,12 +6,13 @@
     <td class="text-center">{{ item.factura }}</td>
     <td class="text-center">{{ computedMontoTotal }}</td>
     <td class="text-center">{{ computedRetencion }}</td>
-    <td class="text-center">{{ item.autorizacion }}</td>
+    
     <td class="text-center">
         {{ item.transferencia.toLocaleString("es-CO") }}
     </td>
     <td class="text-center">{{ computedComision }}</td>
-    <td class="text-center">{{ item.concepto }}</td>
+    <td class="text-center">{{ item.autorizacion }}</td>
+    <!-- <td class="text-center">{{ item.concepto }}</td> -->
     <!-- Debug -->
     <td class="text-center">
         <v-btn

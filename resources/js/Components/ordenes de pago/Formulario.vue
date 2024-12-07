@@ -82,7 +82,7 @@
             </v-col>
             <v-col cols="2"></v-col>
         </v-row>
-        <v-row>
+<!--         <v-row>
             <v-col cols="12">
                 <v-text-field
                     class="custom-dark"
@@ -90,7 +90,7 @@
                     label="Concepto ( opcional )"
                 ></v-text-field>
             </v-col>
-        </v-row>
+        </v-row> -->
 
         <v-row>
             <v-col
@@ -104,14 +104,14 @@
                     type="submit"
                     @click="handleAddToList"
                 >
-                    +
+                    añadir a la lista
                 </v-btn>
                 <v-btn
                     class="w-2/5 justify-center items-center m-2"
                     color="success"
                     @click="submit"
                 >
-                    Procesar
+                    Procesar ordenes
                 </v-btn>
             </v-col>
         </v-row>
@@ -146,16 +146,15 @@ const id_beneficiario = computed(() => {
 
 const transferencia = computed(() => {
     const newValue = parseFloat(
-        ordenDePagoElectronico.value.monto_total -
-            ordenDePagoElectronico.value.retencion_islr
+        ordenDePagoElectronico.value.monto_total - ordenDePagoElectronico.value.retencion_islr
     );
     return Number(newValue.toFixed(2));
 });
 
 const comision_bancaria = computed(() => {
-    const newValue = parseFloat(
-        0.0025 * ordenDePagoElectronico.value.monto_total.toString()
-    );
+        const newValue = parseFloat(
+        0.0025 * transferencia.value.toString()
+    );    
     return Number(newValue.toFixed(2));
 });
 

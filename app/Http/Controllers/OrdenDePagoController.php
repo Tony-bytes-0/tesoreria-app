@@ -39,14 +39,7 @@ class OrdenDePagoController extends Controller
     {
         $validatedData = $request->validate([
             'items' => 'array|min:1',
-            'items.*.rif' => 'required|string',
-            'items.*.fecha' => 'required|date',
-            'items.*.tipo' => 'required|string',
-            'items.*.tasa' => 'required|numeric',
-            'items.*.banco_nombre' => 'required|string',
-            'items.*.codigo_cuenta' => 'required|string',
-            'items.*.tipo_cuenta' => 'string',
-            //'items.*.beneficiario' => '',
+            
             'items.*.id_beneficiario' => 'required|numeric',
             'items.*.factura' => 'required|string',
             'items.*.monto_total' => 'required|string',
@@ -54,12 +47,21 @@ class OrdenDePagoController extends Controller
             'items.*.autorizacion' => 'required|string',
             'items.*.transferencia' => 'required|numeric',
             'items.*.comision_bancaria' => 'required|numeric',
-            'items.*.concepto' => '',
+            
+            'properties.concepto' => 'string',
+            'properties.rif' => 'required|string',
+            'properties.fecha' => 'required|date',
+            'properties.tipo' => 'required|string',
+            'properties.tasa' => 'required|numeric',
+            'properties.banco_nombre' => 'required|string',
+            'properties.codigo_cuenta' => 'required|string',
+            'properties.tipo_cuenta' => 'string',
         ]);
+        
 
         $transactionResult = DB::transaction(function () use ($validatedData) {
 
-            $totalSum = 0;
+            $totalSum = 0;// para agregarle un monto total al proceso orden de pago, deberia tener los demas totales
             foreach ($validatedData['items'] as $value) {
                 if (isset($value['transferencia']) && is_numeric($value['transferencia'])) {
                     $totalSum += $value['transferencia'];
@@ -67,12 +69,13 @@ class OrdenDePagoController extends Controller
                     //
                 }
             }
-            $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'numero_orden_de_pago' => '1' ]);
+            
+            $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'concepto' => $validatedData['properties']['concepto']]);
 
 
-            $ordenDePagos = collect($validatedData["items"])->map(function ($item) use($procesoOrdenes)  {
+            $ordenDePagos = collect($validatedData["items"])->map(function ($item) use ($procesoOrdenes, $validatedData) {
                 $item['id_proceso'] = $procesoOrdenes['id'];
-                return OrdenDePagoElectronico::create($item);
+                return OrdenDePagoElectronico::create(array_merge($item, $validatedData['properties']));
             });
 
             return ['orden_de_pagos' => $ordenDePagos, 'proceso_ordenes' => $procesoOrdenes];
@@ -83,6 +86,23 @@ class OrdenDePagoController extends Controller
             'num_records_saved' => count($transactionResult['orden_de_pagos']),
             'saved_records' => $transactionResult['orden_de_pagos'],
             'numero_orden_de_pago' => $transactionResult['proceso_ordenes']['id']
+        ], 201);
+    }
+
+    public function asignarCuentaContable(Request $request)
+    {
+        $validatedData = $request->validate([
+            'id_ordenes' => 'array|min:1',
+            'id_cuenta_contable' => 'required | numeric'
+        ]);
+        $updatedValues = collect($validatedData['id_ordenes'])->map(function ($item) use ($validatedData) {
+            
+            return OrdenDePagoElectronico::whereIn('id', $item); //->update(['id_cuenta_contable' => $validatedData['id_cuenta_contable']]);
+        });
+        dd($updatedValues);
+        return response()->json([
+            'message' => 'mensaje estatic'
+
         ], 201);
     }
 }

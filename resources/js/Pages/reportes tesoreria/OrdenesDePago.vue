@@ -20,6 +20,21 @@
                     <template v-slot:default="{ isActive }">
                         <v-card title="Editar">
                             <v-divider>Asignar cuenta contable</v-divider>
+                            <p v-if="modalResponseMessage.initialValue"></p>
+                            <v-row v-else>
+                                <v-col cols="3"></v-col>
+                                <v-col
+                                    cols="6"
+                                    class="text-center mt-10"
+                                    :class="{
+                                        'bg-red-400':
+                                            modalResponseMessage.error,
+                                            'bg-green-400': !modalResponseMessage.error
+                                    }"
+                                    >{{ modalResponseMessage.message }}</v-col
+                                >
+                                <v-col cols="3"></v-col>
+                            </v-row>
                             <v-row>
                                 <v-col cols="1"></v-col>
                                 <v-col cols="10">
@@ -51,7 +66,10 @@
                             <v-row class="mb-5">
                                 <v-col cols="1"></v-col>
                                 <v-col cols="10" align-self="center"
-                                    ><v-btn class="bg-green-700" @click="submit"
+                                    ><v-btn
+                                        class="bg-green-700"
+                                        @click="submit"
+                                        :loading="loading"
                                         >Procesar</v-btn
                                     ></v-col
                                 >
@@ -98,7 +116,12 @@ var selectedAccount = ref({
     descripcion: "",
 });
 
-const modal = ref(false)
+const modal = ref(false);
+const modalResponseMessage = ref({
+    message: "",
+    error: false,
+    initialValue: true,
+});
 
 const sendDate = (targetValue) => {
     loadItems({ page: 1, itemsPerPage: itemsPerPage.value });
@@ -162,23 +185,36 @@ watch(search, () => {
 });
 
 const submit = async () => {
+    const ordenesArray = selectedItems.value.map((e) => e.id);
+    console.log("en submit, ordenes array", ordenesArray);
     //console.log("datos a enviar: ", items.value);
+    loading.value = true;
     try {
-        const response = await axios
+        await axios
             .post("/api/asignar_cuenta_contable_a_orden", {
-                idOrdenes: selectedItems.map((e) => e.id),
-                idCuentaContable: selectedAccount.value.id,
+                id_ordenes: ordenesArray,
+                id_cuenta_contable: selectedAccount.value.id,
             })
             .then((response) => {
-                staticSucces("Asignacion exitosa ");
                 selectedAccount.value = {
                     id: "",
                     descripcion: "",
                     codigo_cuenta: "",
                 };
+                modalResponseMessage.value = {
+                    initialValue: false,
+                    message: "Carga exitosa",
+                    error: false,
+                };
             });
     } catch (error) {
-        staticError("Codigo de error: " + error.status);
+        modalResponseMessage.value = {
+            initialValue: false,
+            message: "Ha ocurrido un error",
+            error: true,
+        };
+    } finally {
+        loading.value = false;
     }
 };
 </script>
