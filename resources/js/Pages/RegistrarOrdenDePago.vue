@@ -19,11 +19,15 @@ const cuentasBancarias = ref({
     grancacique: props.cuentasGc,
     //añadir cuentas serviencomiendas!!!
 });
-var company = ref("");
+//app control
+var company = ref("grancacique");
+var idCounter = ref(0);
+var editandoTasa = ref(false);
 var cuentasDisponibles = ref([]);
-var items = ref([]); //items del formulario
+//app control
+//items del formulario
+var items = ref([]); 
 var properties = ref({
-    //propiedades para el guardado de cada item
     fecha: "",
     concepto: "",
     tipo: "",
@@ -39,9 +43,27 @@ var selectedAccount = ref({
     banco_nombre: "",
 });
 
-var idCounter = ref(0);
-//var tasaUsd = ref(props.tasas.original.usd)
-var editandoTasa = ref(false);
+const computedTotals = computed(() => {
+    const totalTransferencia = totalize("transferencia");
+
+    return {
+        montoTotal: totalize("monto_total"),
+        transferencia: totalTransferencia.toLocaleString("es-CO"),
+        comisionISLR: totalize("retencion_islr"),
+        comisionBancaria: totalize("comision_bancaria"),
+        divisas: totalTransferencia * properties.value.tasa,
+    };
+});
+
+const totalize = (key) => {
+    let total = 0;
+    if (items.value.length > 0) {
+        items.value.forEach((x) => {
+            total += +x[key];
+        });
+    }
+    return parseFloat(total).toLocaleString("es-CO");
+};
 
 const addToList = (newItem) => {
     if (selectedAccount.value.codigo_cuenta.length < 1 && validateForm.value) {
@@ -50,15 +72,6 @@ const addToList = (newItem) => {
         newItem = {
             ...newItem,
             id: idCounter.value++,
-            //banco_nombre: selectedAccount.value.banco_nombre,
-            //codigo_cuenta: selectedAccount.value.codigo_cuenta,
-            //tipo_cuenta: selectedAccount.value.tipo_cuenta,
-            //numero_orden_de_pago: "0", //estaticoas
-            //concepto: concepto.value,
-            //rif: rif.value,
-            //tipo: tipo.value,
-            //fecha: fecha.value,
-            //tasa: tasaUsd.value,
         };
         items.value.push(newItem);
     }
@@ -66,8 +79,6 @@ const addToList = (newItem) => {
 const deleteItem = (targetId) => {
     items.value = items.value.filter((x) => x.id !== targetId);
 };
-//elementos que se repiten en cada registro
-//cuenta bancaria
 
 const accProps = (item) => {
     return {
@@ -90,7 +101,7 @@ const accProps = (item) => {
 };
 
 const selectAccGroup = (key) => {
-    selectedAccount.value = {}
+    selectedAccount.value = {};
     company.value = key;
     switch (key) {
         case "naviarca":
@@ -103,7 +114,7 @@ const selectAccGroup = (key) => {
             properties.value.rif = "j293703700";
             break;
     }
-    console.log('valor del rif: ', properties.value.rif)
+    console.log("valor del rif: ", properties.value.rif);
     if (key == "serviencomiendas") {
         cuentasDisponibles.value = [];
     } else {
@@ -111,45 +122,13 @@ const selectAccGroup = (key) => {
     }
 };
 
-const totalize = (key) => {
-    let total = 0;
-    if (items.value.length > 0) {
-        items.value.forEach((x) => {
-            total += +x[key];
-        });
-    }
-    return parseFloat(total).toLocaleString("es-CO");
-};
-
-const sumMontoTotal = computed(() => {
-    let total = 0;
-    if (items.value.length > 0) {
-        items.value.forEach((x) => {
-            total += +x.monto_total;
-        });
-    }
-    return parseFloat(total).toLocaleString("es-CO");
-});
-
-const sumISLR = computed(() => {
-    return totalize("retencion_islr");
-});
-
-const sumTransferencia = computed(() => {
-    return totalize("transferencia");
-});
-
-const sumComisionBancaria = computed(() => {
-    return totalize("comision_bancaria");
-});
-
 const submit = async () => {
     console.log("datos a enviar: ", properties.value.rif);
     try {
         const response = await axios
             .post("/api/registrar_orden_de_pago", {
                 items: items.value,
-                properties: {...properties.value, ...selectedAccount.value},
+                properties: { ...properties.value, ...selectedAccount.value },
             })
             .then((response) => {
                 staticSucces(
@@ -166,7 +145,6 @@ const submit = async () => {
 </script>
 
 <template>
-    <!-- <Navbar /> -->
     <Navbar>
         <v-row dense class="mt-20 ml-20 mr-20">
             <v-col md="12">
@@ -180,12 +158,12 @@ const submit = async () => {
         </v-row>
         <v-row dense class="ml-20 mr-20">
             <v-col md="3" align-self="center"
-                >Monto total a cancelar: {{ sumMontoTotal + " Bs." }}</v-col
+                >Monto total a cancelar: {{ computedTotals.montoTotal + " Bs." }}</v-col
             >
             <v-col md="3" align-self="center"
-                >Equivalente en $:
-                {{ Number(sumMontoTotal) * properties.tasa + " Bs." }}</v-col
-            >
+                >Equivalente a:
+                {{ computedTotals.divisas.toLocaleString("es-CO") + " $ " }}
+            </v-col>
             <v-row v-if="editandoTasa">
                 <v-col md="3">
                     <v-text-field
@@ -201,7 +179,8 @@ const submit = async () => {
             </v-row>
 
             <v-col md="3" align-self="center" v-else>
-                Tasa de cambio $: {{ properties.tasa.toLocaleString("es-CO") }} Bs.
+                Tasa de cambio $:
+                {{ properties.tasa.toLocaleString("es-CO") }} Bs.
                 <v-btn
                     class="p-2 ml-2"
                     @click="editandoTasa = !editandoTasa"
@@ -258,9 +237,13 @@ const submit = async () => {
                 <v-col cols="12" class="text-center p-2">
                     <v-btn
                         @click="selectAccGroup('serviencomiendas')"
+                        block
+                        outline
+                        class="w-full"
                         :class="{ selected: company == 'serviencomiendas' }"
                         :disabled="items.length > 0"
-                        >Serviencomiendas</v-btn
+                        ><span class="text-wrap" style="width: min-content; margin: auto;">
+    serviencomiendas</span></v-btn
                     >
                 </v-col>
             </v-col>
@@ -302,7 +285,6 @@ const submit = async () => {
                     v-model="properties.concepto"
                 ></v-text-field>
             </v-col>
-            <h1>{{ properties.rif }}</h1>
 
             <!-- <v-col cols="2"></v-col> -->
         </v-row>
@@ -328,16 +310,23 @@ const submit = async () => {
                 <tr v-for="item in items" :key="item.id">
                     <ItemOnList :item="item" @deleteItem="deleteItem" />
                 </tr>
-                <tr></tr>
+                
                 <tr>
                     <td class="text-center"><b>totales:</b></td>
                     <td class="text-center"></td>
                     <td class="text-center"></td>
                     <td class="text-center"></td>
-                    <td class="text-center">{{ sumMontoTotal }}</td>
-                    <td class="text-center">{{ sumISLR }}</td>
-                    <td class="text-center">{{ sumTransferencia }}</td>
-                    <td class="text-center">{{ sumComisionBancaria }}</td>
+                    <td class="text-center"></td>
+                    <td class="text-center">{{ computedTotals.montoTotal }}</td>
+                    <td class="text-center">
+                        {{ computedTotals.comisionISLR }}
+                    </td>
+                    <td class="text-center">
+                        {{ computedTotals.transferencia }}
+                    </td>
+                    <td class="text-center">
+                        {{ computedTotals.comisionBancaria }}
+                    </td>
                 </tr>
             </tbody>
         </v-table>
