@@ -23,11 +23,17 @@ class ReportesTesoreria extends Controller
     public function consultarOrdenesDePago(Request $request)
     {
         $validated = $request->validate([
-            'perPage' => 'numeric|required',
+            'id_proceso' => 'required|numeric',
+            'per_page' => 'numeric|required',
             'page' => 'numeric|required',
         ]);
-        $ordenesArray = OrdenDePagoElectronico::with('beneficiario')->orderBy('id')->paginate(perPage: $validated['perPage'], page: $validated['page']);
+        $ordenesArray = OrdenDePagoElectronico::with('beneficiario')->where('id_proceso', '=', $validated['id_proceso'])->orderBy('id')->paginate(perPage: $validated['per_page'], page: $validated['page']);
         //$ordenesArray = DB::table('orden_de_pago_electronicos')->orderBy('id')->simplePaginate();
+        if($ordenesArray->isEmpty()){
+            return response()->json([
+                'message' => 'No existe el proceso orden de pago numero: '.$validated['id_proceso'],
+            ], 204);
+        }
         return response()->json([
             'items' => $ordenesArray
         ], 201);

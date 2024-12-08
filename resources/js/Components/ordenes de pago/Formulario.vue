@@ -268,10 +268,4 @@ const people = ref([
     /*background-color:#3CBC8D;*/
     padding: 0px;
 }
-input {
-    background-color: #3cbc8d;
-}
-#input- {
-    background-color: #3cbc8d;
-}
 </style>

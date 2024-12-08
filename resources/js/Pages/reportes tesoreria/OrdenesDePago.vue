@@ -1,9 +1,23 @@
 <template>
     <Navbar>
         <div class="mt-20 ml-5">
-            <h1>Reporte ordenes de pago</h1>
+            <!-- <h1>Reporte ordenes de pago</h1> -->
         </div>
-        <DateRange @sendDate="sendDate" />
+        <!-- <DateRange @sendDate="sendDate" /> -->
+        <v-container fluid>
+            <v-row align="center" justify="center">
+                <v-col cols="5">
+                    <v-text-field
+                        v-model="id_proceso"
+                        class="custom-dark"
+                        label="Numero de proceso de pago"
+                    ></v-text-field>
+                </v-col>
+                <v-col cols="2" align-self="center"
+                    ><v-btn @click="loadItems">Buscar</v-btn></v-col
+                >
+            </v-row>
+        </v-container>
 
         <v-row class="mb-10">
             <v-col>
@@ -29,7 +43,8 @@
                                     :class="{
                                         'bg-red-400':
                                             modalResponseMessage.error,
-                                            'bg-green-400': !modalResponseMessage.error
+                                        'bg-green-400':
+                                            !modalResponseMessage.error,
                                     }"
                                     >{{ modalResponseMessage.message }}</v-col
                                 >
@@ -86,11 +101,34 @@
             :headers="headers"
             :items="serverItems"
             item-value="id"
-            items-per-page="10"
+            :items-per-page="itemsPerPage"
             return-object
             show-select
             hover
+            hide-default-footer
         ></v-data-table>
+        <!--         <v-data-table-server
+            class="pagination"
+            v-model:items-per-page="itemsPerPage"
+            item-value="id"
+            :headers="headers"
+            :items="serverItems"
+            :loading="loading"
+            :total-items="totalItems"
+            :items-length="totalItems"
+            return-object
+            hide-default-footer
+            show-select
+            hover
+        > -->
+
+<!--         <div class="text-center">
+            <v-pagination
+                v-model="page"
+                :length="totalItems"
+                :total-visible="7"
+            ></v-pagination>
+        </div> -->
         <h1>{{ selectedItems }}</h1>
     </Navbar>
 </template>
@@ -116,7 +154,6 @@ var selectedAccount = ref({
     descripcion: "",
 });
 
-const modal = ref(false);
 const modalResponseMessage = ref({
     message: "",
     error: false,
@@ -148,30 +185,41 @@ const headers = [
     { title: "Concepto", key: "concepto", align: "end" },
 ];
 //table data datos de la tabla
+var id_proceso = ref("");
 const selectedItems = ref([]);
 const search = ref("");
 const serverItems = ref([]);
 const loading = ref(false);
-const page = ref(2);
-const itemsPerPage = ref(15);
+const page = ref(1);
+const itemsPerPage = ref(10);
+const totalItems = ref(10);
 //const sortBy = ref([{ key: "name", order: "asc" }]);
 //const sortByDesc = computed(() => sortBy.value[0]?.order === "desc");
-//const totalItems = ref(3);
 
-function loadItems({ page, itemsPerPage }) {
+const selectItem = (item) => {
+    console.log("dentro del row, item seleccionado: ", item);
+};
+
+function loadItems() {
     loading.value = true;
     axios({
         method: "GET",
         url: "/api/consultar_ordenes_de_pago",
         params: {
-            page: page,
-            perPage: itemsPerPage,
+            id_proceso: Number(id_proceso.value),
+            page: Number(page.value),
+            per_page: Number(itemsPerPage.value),
         },
         data: {
             example: "",
         },
     }).then((response) => {
-        serverItems.value = response.data.items.data;
+        if (response.status == 204) {
+            //quick dialog, de no hay datos
+        } else {
+            serverItems.value = response.data.items.data;
+            totalItems.value = response.data.items.total;
+        }
     });
     loading.value = false;
 }
@@ -237,5 +285,20 @@ const submit = async () => {
 }
 .v-pagination__first {
     color: #f1f1f1;
+}
+.custom-option:hover {
+    transition: 1s;
+    background-color: black;
+    opacity: 50;
+}
+.custom-input:focus {
+    background-color: black !important;
+}
+.custom-dark input {
+    color: white !important;
+    background-color: #3d3d3d;
+}
+.custom-dark {
+    color: gray !important;
 }
 </style>
