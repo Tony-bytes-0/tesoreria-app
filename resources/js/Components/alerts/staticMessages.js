@@ -19,3 +19,21 @@ export const staticSucces = (propsText) => {
         },
     });
 };
+
+export const fastMsg = (propsText) => {
+    const toast = Swal.mixin({
+        toast: true,
+        icon: "info",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: "top-end",
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        },
+    });
+    toast.fire({
+        icon:"success", title: propsText
+    })
+}

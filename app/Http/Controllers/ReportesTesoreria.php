@@ -38,4 +38,6 @@ class ReportesTesoreria extends Controller
             'items' => $ordenesArray
         ], 201);
     }
+
+    //public function consultarUltimasOrdenes(Request)
 }

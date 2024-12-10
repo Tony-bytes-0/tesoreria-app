@@ -3,6 +3,7 @@ import { staticError, staticSucces } from "@/Components/alerts/staticMessages";
 import Formulario from "@/Components/ordenes de pago/Formulario.vue";
 import ItemOnList from "@/Components/ordenes de pago/ItemOnList.vue";
 import TableheadThs from "@/Components/ordenes de pago/TableheadThs.vue";
+import { formatedNumber } from "@/helpers/numbers";
 import Navbar from "@/Layouts/Navbar.vue";
 import axios from "axios";
 import { ref, defineProps, computed } from "vue";
@@ -26,7 +27,7 @@ var editandoTasa = ref(false);
 var cuentasDisponibles = ref([]);
 //app control
 //items del formulario
-var items = ref([]); 
+var items = ref([]);
 var properties = ref({
     fecha: "",
     concepto: "",
@@ -44,14 +45,13 @@ var selectedAccount = ref({
 });
 
 const computedTotals = computed(() => {
-    const totalTransferencia = totalize("transferencia");
-
+    const totalTransferencia = parseFloat(totalize("transferencia"));
     return {
         montoTotal: totalize("monto_total"),
-        transferencia: totalTransferencia.toLocaleString("es-CO"),
+        transferencia: totalize("transferencia"),
         comisionISLR: totalize("retencion_islr"),
         comisionBancaria: totalize("comision_bancaria"),
-        divisas: totalTransferencia * properties.value.tasa,
+        divisas: totalTransferencia / properties.value.tasa,
     };
 });
 
@@ -62,8 +62,9 @@ const totalize = (key) => {
             total += +x[key];
         });
     }
-    return parseFloat(total).toLocaleString("es-CO");
+    return total;
 };
+
 
 const addToList = (newItem) => {
     if (selectedAccount.value.codigo_cuenta.length < 1 && validateForm.value) {
@@ -158,11 +159,13 @@ const submit = async () => {
         </v-row>
         <v-row dense class="ml-20 mr-20">
             <v-col md="3" align-self="center"
-                >Monto total a cancelar: {{ computedTotals.montoTotal + " Bs." }}</v-col
+                >Monto total a cancelar:
+                {{ formatedNumber(computedTotals.transferencia) + " Bs." }}</v-col
             >
+
             <v-col md="3" align-self="center"
                 >Equivalente a:
-                {{ computedTotals.divisas.toLocaleString("es-CO") + " $ " }}
+                {{ formatedNumber(computedTotals.divisas) + " $ " }}
             </v-col>
             <v-row v-if="editandoTasa">
                 <v-col md="3">
@@ -242,8 +245,12 @@ const submit = async () => {
                         class="w-full"
                         :class="{ selected: company == 'serviencomiendas' }"
                         :disabled="items.length > 0"
-                        ><span class="text-wrap" style="width: min-content; margin: auto;">
-    serviencomiendas</span></v-btn
+                        ><span
+                            class="text-wrap"
+                            style="width: min-content; margin: auto"
+                        >
+                            serviencomiendas</span
+                        ></v-btn
                     >
                 </v-col>
             </v-col>
@@ -310,7 +317,7 @@ const submit = async () => {
                 <tr v-for="item in items" :key="item.id">
                     <ItemOnList :item="item" @deleteItem="deleteItem" />
                 </tr>
-                
+
                 <tr>
                     <td class="text-center"><b>totales:</b></td>
                     <td class="text-center"></td>

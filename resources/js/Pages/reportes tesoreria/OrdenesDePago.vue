@@ -140,7 +140,7 @@ import axios from "axios";
 import "vuetify/styles";
 import "vuetify";
 import { computed, onMounted, ref, watch } from "vue";
-import { staticError, staticSucces } from "@/Components/alerts/staticMessages";
+import { fastMsg, staticError, staticSucces } from "@/Components/alerts/staticMessages";
 
 const props = defineProps(["ordenesDePago", "cuentasContables"]);
 var date = ref({
@@ -215,7 +215,7 @@ function loadItems() {
         },
     }).then((response) => {
         if (response.status == 204) {
-            //quick dialog, de no hay datos
+            fastMsg('No existen registros con el numero: ' + id_proceso.value);
         } else {
             serverItems.value = response.data.items.data;
             totalItems.value = response.data.items.total;
