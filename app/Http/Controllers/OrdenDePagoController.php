@@ -39,7 +39,7 @@ class OrdenDePagoController extends Controller
     {
         $validatedData = $request->validate([
             'items' => 'array|min:1',
-            
+
             'items.*.id_beneficiario' => 'required|numeric',
             'items.*.factura' => 'required|string',
             'items.*.monto_total' => 'required|string',
@@ -47,7 +47,7 @@ class OrdenDePagoController extends Controller
             'items.*.autorizacion' => 'required|string',
             'items.*.transferencia' => 'required|numeric',
             'items.*.comision_bancaria' => 'required|numeric',
-            
+
             'properties.concepto' => 'string',
             'properties.rif' => 'required|string',
             'properties.fecha' => 'required|date',
@@ -57,11 +57,11 @@ class OrdenDePagoController extends Controller
             'properties.codigo_cuenta' => 'required|string',
             'properties.tipo_cuenta' => 'string',
         ]);
-        
+
 
         $transactionResult = DB::transaction(function () use ($validatedData) {
 
-            $totalSum = 0;// para agregarle un monto total al proceso orden de pago, deberia tener los demas totales
+            $totalSum = 0; // para agregarle un monto total al proceso orden de pago, deberia tener los demas totales
             foreach ($validatedData['items'] as $value) {
                 if (isset($value['transferencia']) && is_numeric($value['transferencia'])) {
                     $totalSum += $value['transferencia'];
@@ -69,7 +69,7 @@ class OrdenDePagoController extends Controller
                     //
                 }
             }
-            
+
             $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'concepto' => $validatedData['properties']['concepto']]);
 
 
@@ -96,13 +96,14 @@ class OrdenDePagoController extends Controller
             'id_cuenta_contable' => 'required | numeric'
         ]);
         $updatedValues = collect($validatedData['id_ordenes'])->map(function ($item) use ($validatedData) {
-            
-            return OrdenDePagoElectronico::whereIn('id', $item); //->update(['id_cuenta_contable' => $validatedData['id_cuenta_contable']]);
-        });
-        dd($updatedValues);
-        return response()->json([
-            'message' => 'mensaje estatic'
 
+            //return OrdenDePagoElectronico::get()->whereIn('id', $item); //->update(['id_cuenta_contable' => $validatedData['id_cuenta_contable']]);
+            return OrdenDePagoElectronico::where('id', $item)->update(['id_cuenta_contable' => $validatedData['id_cuenta_contable']]);
+        });
+        //dd($updatedValues);
+        return response()->json([
+            'message' => 'mensaje estatic',
+            
         ], 201);
     }
 }

@@ -5,6 +5,7 @@
         </div>
         <!-- <DateRange @sendDate="sendDate" /> -->
         <v-container fluid>
+            <form @submit.prevent="loadItems">
             <v-row align="center" justify="center">
                 <v-col cols="5">
                     <v-text-field
@@ -14,9 +15,10 @@
                     ></v-text-field>
                 </v-col>
                 <v-col cols="2" align-self="center"
-                    ><v-btn @click="loadItems">Buscar</v-btn></v-col
+                    ><v-btn submit @click="loadItems">Buscar</v-btn></v-col
                 >
             </v-row>
+            </form>
         </v-container>
 
         <v-row class="mb-10">
@@ -39,11 +41,11 @@
                                 <v-col cols="3"></v-col>
                                 <v-col
                                     cols="6"
-                                    class="text-center mt-10"
+                                    class="text-center mt-10 rounded-md"
                                     :class="{
                                         'bg-red-400':
                                             modalResponseMessage.error,
-                                        'bg-green-400':
+                                        'bg-green-700':
                                             !modalResponseMessage.error,
                                     }"
                                     >{{ modalResponseMessage.message }}</v-col
@@ -166,6 +168,7 @@ const sendDate = (targetValue) => {
     console.log(targetValue);
 };
 
+
 const headers = [
     { title: "Nº", key: "id", align: "end" },
     { title: "Orden de pago", key: "id_proceso", align: "end" },
@@ -181,7 +184,7 @@ const headers = [
     { title: "Comisión bancaria", key: "comision_bancaria", align: "end" },
     { title: "Nº factura", key: "factura", align: "end" },
     { title: "Nº autorización", key: "autorizacion", align: "end" },
-    { title: "Cuenta contable", key: "cuenta_contable", align: "end" },
+    { title: "Cuenta contable", key: "cuenta_contable[0].descripcion", align: "end" },
     { title: "Concepto", key: "concepto", align: "end" },
 ];
 //table data datos de la tabla
@@ -200,7 +203,7 @@ const selectItem = (item) => {
     console.log("dentro del row, item seleccionado: ", item);
 };
 
-function loadItems() {
+async function loadItems() {
     loading.value = true;
     axios({
         method: "GET",
@@ -210,15 +213,13 @@ function loadItems() {
             page: Number(page.value),
             per_page: Number(itemsPerPage.value),
         },
-        data: {
-            example: "",
-        },
     }).then((response) => {
+        console.log('OLD BUT GOLD', response.data.items)
         if (response.status == 204) {
             fastMsg('No existen registros con el numero: ' + id_proceso.value);
         } else {
-            serverItems.value = response.data.items.data;
-            totalItems.value = response.data.items.total;
+            serverItems.value = response.data.items;
+            //totalItems.value = response.data;
         }
     });
     loading.value = false;
