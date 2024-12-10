@@ -18,13 +18,14 @@ Route::post('/registrar_orden_de_pago', [OrdenDePagoController::class, 'registra
 Route::get('/tasa', [Tasa::class, 'consultar_tasa']);
 
 //selectores
-Route::get('/consultar_cuentas_contables', [CuentasContable::class, 'consultar']);
-
+Route::get('/consultar_cuentas_contables',  [CuentasContable::class, 'consultar']);
 //reportes
 
 Route::get('/consultar_ordenes_de_pago', [ReportesTesoreria::class, 'consultarOrdenesDePago']);
+Route::get('/consultar_ordenes_de_pago_ultimas', [ReportesTesoreria::class, 'consultarUltimasOrdenes']);
 
 //administrar
 
 Route::post('/asignar_cuenta_contable_a_orden', [OrdenDePagoController::class, 'asignarCuentaContable']);
+
 

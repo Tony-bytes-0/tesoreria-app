@@ -15,8 +15,10 @@
                     ></v-text-field>
                 </v-col>
                 <v-col cols="2" align-self="center"
-                    ><v-btn submit @click="loadItems">Buscar</v-btn></v-col
+                    ><v-btn submit @click="loadItems">Buscar</v-btn>
+                    </v-col
                 >
+                <v-col cols="2"><v-btn submit @click="loadItems(false)">ultimos registros</v-btn></v-col>
             </v-row>
             </form>
         </v-container>
@@ -109,28 +111,9 @@
             hover
             hide-default-footer
         ></v-data-table>
-        <!--         <v-data-table-server
-            class="pagination"
-            v-model:items-per-page="itemsPerPage"
-            item-value="id"
-            :headers="headers"
-            :items="serverItems"
-            :loading="loading"
-            :total-items="totalItems"
-            :items-length="totalItems"
-            return-object
-            hide-default-footer
-            show-select
-            hover
-        > -->
 
-<!--         <div class="text-center">
-            <v-pagination
-                v-model="page"
-                :length="totalItems"
-                :total-visible="7"
-            ></v-pagination>
-        </div> -->
+        <v-pagination class="mt-10" :length="totalVisible" v-model="itemsPerPage" :total-visible="10" >asdasd</v-pagination>
+
         <h1>{{ selectedItems }}</h1>
     </Navbar>
 </template>
@@ -196,18 +179,23 @@ const loading = ref(false);
 const page = ref(1);
 const itemsPerPage = ref(10);
 const totalItems = ref(10);
+const totalVisible = computed(() => {
+    var pageLength = 1
+    while(pageLength < totalItems){
+        pageLength++
+    }
+    return pageLength
+});
 //const sortBy = ref([{ key: "name", order: "asc" }]);
 //const sortByDesc = computed(() => sortBy.value[0]?.order === "desc");
 
-const selectItem = (item) => {
-    console.log("dentro del row, item seleccionado: ", item);
-};
-
-async function loadItems() {
+async function loadItems(last) {
+    
     loading.value = true;
+    console.log('id_proceso values: ', id_proceso.value, typeof(id_proceso.value))
     axios({
         method: "GET",
-        url: "/api/consultar_ordenes_de_pago",
+        url: last ? "/api/consultar_ordenes_de_pago" : "/api/consultar_ordenes_de_pago_ultimas",
         params: {
             id_proceso: Number(id_proceso.value),
             page: Number(page.value),
@@ -218,8 +206,8 @@ async function loadItems() {
         if (response.status == 204) {
             fastMsg('No existen registros con el numero: ' + id_proceso.value);
         } else {
-            serverItems.value = response.data.items;
-            //totalItems.value = response.data;
+            serverItems.value = response.data.items.data;
+            totalItems.value = response.data.items
         }
     });
     loading.value = false;
