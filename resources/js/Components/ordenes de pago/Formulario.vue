@@ -98,7 +98,7 @@
                 ></v-text-field>
             </v-col>
         </v-row>
-
+        
         <v-row>
             <v-col
                 cols="12"
@@ -169,10 +169,6 @@ const comision_bancaria = computed(() => {
     return Number(newValue.toFixed(2));
 });
 
-const canAddToList = computed(() => {
-
-})
-
 const validateForm = (item) => {
     var validationObject = Object.assign({}, item);
     delete validationObject.concepto; //propiedad no validable
@@ -201,6 +197,7 @@ const resetForm = () => {
     };
 };
 const handleAddToList = () => {
+    console.log('formulario: ', ordenDePagoElectronico.value)
     if (validateForm(ordenDePagoElectronico.value) && props.validateForm) {
         staticError("Complete el formulario");
     } else {

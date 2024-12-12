@@ -53,8 +53,11 @@
                 location="left"
                 temporary
             >
+                <v-divider class="mt-20">Ordenes de pago</v-divider>
+                
                 <v-list v-for="item in items">
                     <NavLink :href="item.href">{{ item.title }}</NavLink>
+                    
                 </v-list>
             </v-navigation-drawer>
         </v-layout>
@@ -78,9 +81,9 @@ function alterTheme() {
 const drawer = ref(false);
 const menuIconPath = ref(mdiMenu);
 const items = [
-    { title: "Ordenes de pago", value: "foo", href: "/OrdenesDePago" },
+    { title: "Consultar", value: "foo", href: "/OrdenesDePago" },
     {
-        title: "Registrar orden de pago",
+        title: "Registrar",
         value: "bar",
         href: "/RegistrarOrdenDePago",
     },

@@ -6,6 +6,7 @@ use App\Models\CuentasContable;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\OrdenDePagoElectronico;
+use App\Models\ProcesoOrdenDePago;
 use Illuminate\Support\Facades\DB;
 
 class ReportesTesoreria extends Controller
@@ -30,14 +31,15 @@ class ReportesTesoreria extends Controller
         //>with('beneficiario', 'cuenta_contable')->where('id_proceso', '=', $validated['id_proceso'])->orderBy('id');
         //$ordenesArray = OrdenDePagoElectronico::with('beneficiario', 'cuenta_contable')->where('id_proceso', '=', $validated['id_proceso'])->orderBy('id')->paginate(perPage: $validated['per_page'], page: $validated['page']);
         $ordenesArray = OrdenDePagoElectronico::with('beneficiario', 'cuenta_contable')->where('id_proceso', '=', $validated['id_proceso'])->orderBy('id')->orderBy('id')->paginate(perPage: $validated['per_page'], page: $validated['page']);
-        
+        $conceptoGeneral = ProcesoOrdenDePago::where('id', '=', 'id_proceso');
         if ($ordenesArray->isEmpty()) {
             return response()->json([
                 'message' => 'No existe el proceso orden de pago numero: ' . $validated['id_proceso'],
             ], 204);
         }
         return response()->json([
-            'items' => $ordenesArray
+            'items' => $ordenesArray,
+            'concepto'
         ], 201);
     }
 

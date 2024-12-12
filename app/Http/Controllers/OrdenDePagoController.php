@@ -48,6 +48,7 @@ class OrdenDePagoController extends Controller
             'items.*.transferencia' => 'required|numeric',
             'items.*.comision_bancaria' => 'required|numeric',
             'items.*.numero_personas' => 'nullable',
+            'items.*.concepto' => 'nullable',
 
             'properties.concepto' => 'string|nullable',
             'properties.rif' => 'required|string',
@@ -61,7 +62,7 @@ class OrdenDePagoController extends Controller
 
 
         $transactionResult = DB::transaction(function () use ($validatedData) {
-
+ 
             $totalSum = 0; // para agregarle un monto total al proceso orden de pago, deberia tener los demas totales
             foreach ($validatedData['items'] as $value) {
                 if (isset($value['transferencia']) && is_numeric($value['transferencia'])) {
@@ -70,12 +71,13 @@ class OrdenDePagoController extends Controller
                     //
                 }
             }
-
+            
             $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'concepto' => $validatedData['properties']['concepto']]);
-
 
             $ordenDePagos = collect($validatedData["items"])->map(function ($item) use ($procesoOrdenes, $validatedData) {
                 $item['id_proceso'] = $procesoOrdenes['id'];
+                unset($validatedData['properties']['concepto']);//elimino el concepto, se repite en items y properties
+                
                 return OrdenDePagoElectronico::create(array_merge($item, $validatedData['properties']));
             });
 
