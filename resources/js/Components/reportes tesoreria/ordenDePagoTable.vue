@@ -6,6 +6,6 @@
 </template>
 
 <script setup>
-import TableheadThs from '../ordenes de pago/TableheadThs.vue';
+import TableheadThs from '../ordenes de pago/TableheadProveedores.vue';
 
 </script>

@@ -110,7 +110,22 @@
             show-select
             hover
             hide-default-footer
-        ></v-data-table>
+        >
+    <template v-slot:item = {item}>
+        <tr>
+            <td class="text-center border">uno</td>
+            <td class="text-center border">uno</td>
+            <td class="text-center border">uno</td>
+            <td class="text-center border">uno</td>
+            <td class="text-center border">uno</td>
+            <td class="text-center border">uno</td>
+            <td class="text-center border">uno</td>
+            <td class="text-center border">uno</td>
+            <td class="text-center border">uno</td>
+            <td class="text-center border">uno</td>
+        </tr>
+    </template>
+    </v-data-table>
 
         <v-pagination class="mt-10" :length="visiblePagination" v-model="itemsPerPage" :total-visible="10" >asdasd</v-pagination>
 

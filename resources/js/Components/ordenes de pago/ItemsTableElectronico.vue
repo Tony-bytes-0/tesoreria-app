@@ -2,19 +2,10 @@
     <!-- <td class="text-center">{{ item.referencia }}</td> -->
      <td class="text-center">{{ item.beneficiario.rif }}</td>
     <td class="text-center">{{ item.beneficiario.descripcion }}</td>
-    <td class="text-center">{{ item.beneficiario.codigo_cuenta }}</td>
-    <td class="text-center">{{ item.factura }}</td>
-    <td class="text-center">{{ item.autorizacion }}</td>
-    <td class="text-center">{{ computedMontoTotal }}</td>
-    <td class="text-center">{{ computedRetencion }}</td>
+    <td class="text-center">{{ item.concepto }}</td>
+    <td class="text-center">{{ item.numero_personas}}</td>
+    <td class="text-center">{{ formatedNumber( item.monto_total) }}</td>
     
-    <td class="text-center">
-        {{ item.transferencia.toLocaleString("es-CO") }}
-    </td>
-    <td class="text-center">{{ computedComision }}</td>
-    
-    <!-- <td class="text-center">{{ item.concepto }}</td> -->
-    <!-- Debug -->
     <td class="text-center">
         <v-btn
             variant="text"
@@ -28,6 +19,7 @@
 </template>
 
 <script setup>
+import { formatedNumber } from "@/helpers/numbers";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiDelete } from "@mdi/js";
 import { computed } from "vue";

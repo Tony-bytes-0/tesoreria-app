@@ -1,14 +1,18 @@
 <script setup>
 import { staticError, staticSucces } from "@/Components/alerts/staticMessages";
 import Formulario from "@/Components/ordenes de pago/Formulario.vue";
-import ItemOnList from "@/Components/ordenes de pago/ItemOnList.vue";
-import TableheadThs from "@/Components/ordenes de pago/TableheadThs.vue";
+import ComputedTotalsProveedores from "@/Components/ordenes de pago/ComputedTotalsProveedores.vue";
 import { formatedNumber } from "@/helpers/numbers";
 import Navbar from "@/Layouts/Navbar.vue";
 import axios from "axios";
 import { ref, defineProps, computed } from "vue";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiCheckBold } from "@mdi/js";
+import TableHeadsElectronico from "@/Components/ordenes de pago/TableHeadsElectronico.vue";
+import ComputedTotalsElectronico from "@/Components/ordenes de pago/ComputedTotalsElectronico.vue";
+import TableheadProveedores from "@/Components/ordenes de pago/TableheadProveedores.vue";
+import ItemsTableProveedores from "@/Components/ordenes de pago/ItemsTableProveedores.vue";
+import ItemsTableElectronico from "@/Components/ordenes de pago/ItemsTableElectronico.vue";
 
 const successIconPath = mdiCheckBold;
 const validateForm = ref(true);
@@ -24,7 +28,7 @@ const cuentasBancarias = ref({
     //añadir cuentas serviencomiendas!!!
 });
 //app control
-var company = ref("grancacique");
+var company = ref("");
 var idCounter = ref(0);
 var editandoTasa = ref(false);
 var cuentasDisponibles = ref([]);
@@ -55,6 +59,7 @@ const computedTotals = computed(() => {
         comisionISLR: totalize("retencion_islr"),
         comisionBancaria: totalize("comision_bancaria"),
         divisas: totalTransferencia / properties.value.tasa,
+        numero_personas: totalize("numero_personas"),
     };
 });
 
@@ -112,7 +117,7 @@ const resetForm = () => {
         tasa: props.tasas.original.usd,
         rif: "",
     };
-    company.value = ''
+    company.value = "";
     resetAccount();
 };
 
@@ -245,14 +250,18 @@ const submit = async () => {
         </v-row>
 
         <v-divider :thickness="7">Datos de la Cuenta</v-divider>
-
-        <SvgIcon
+        <v-row>
+            <v-col cols="2"><SvgIcon
             type="mdi"
             :path="successIconPath"
             size="50"
             v-if="showForm"
         ></SvgIcon>
+</v-col>
+            <v-col cols="10"></v-col>
 
+        </v-row>
+        
         <v-row class="m-2">
             <v-row align-content="center">
                 <v-container fluid>
@@ -359,32 +368,62 @@ const submit = async () => {
         <v-table height="300px" fixed-header>
             <thead>
                 <tr>
-                    <TableheadThs />
+                    <TableHeadsElectronico
+                        v-if="properties.tipo == 'Electronico'"
+                    />
+                    <TableheadProveedores
+                        v-if="properties.tipo == 'Proveedores'"
+                    />
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="item in items" :key="item.id">
-                    <ItemOnList :item="item" @deleteItem="deleteItem" />
+                    <ItemsTableProveedores
+                        :item="item"
+                        @deleteItem="deleteItem"
+                        v-if="properties.tipo == 'Proveedores'"
+                    />
+                    <ItemsTableElectronico
+                        :item="item"
+                        @deleteItem="deleteItem"
+                        v-if="properties.tipo == 'Electronico'"
+                    />
                 </tr>
 
                 <tr>
-                    <td class="text-center"><b>totales:</b></td>
-                    <td class="text-center"></td>
-                    <td class="text-center"></td>
-                    <td class="text-center"></td>
-                    <td class="text-center"></td>
-                    <td class="text-center">
-                        {{ formatedNumber(computedTotals.montoTotal) }}
-                    </td>
-                    <td class="text-center">
-                        {{ formatedNumber(computedTotals.comisionISLR) }}
-                    </td>
-                    <td class="text-center">
-                        {{ formatedNumber(computedTotals.transferencia) }}
-                    </td>
-                    <td class="text-center">
-                        {{ formatedNumber(computedTotals.comisionBancaria) }}
-                    </td>
+                    <ComputedTotalsProveedores
+                        v-if="properties.tipo == 'Proveedores'"
+                        :monto_total="computedTotals.montoTotal"
+                        :comision-bancaria="computedTotals.comisionBancaria"
+                        :comision-i-s-l-r="computedTotals.comisionISLR"
+                        :transferencia="computedTotals.transferencia"
+                    />
+                    <ComputedTotalsElectronico
+                        :monto_total="computedTotals.montoTotal"
+                        :numero_personas="computedTotals.numero_personas"
+                        v-if="properties.tipo == 'Electronico'"
+                    />
+                    <!--                     <div v-if="properties.tipo == 'Proveedores'">
+                        <td class="text-center"><b>totales:</b></td>
+                        <td class="text-center"></td>
+                        <td class="text-center"></td>
+                        <td class="text-center"></td>
+                        <td class="text-center"></td>
+                        <td class="text-center">
+                            {{ formatedNumber(computedTotals.montoTotal) }}
+                        </td>
+                        <td class="text-center">
+                            {{ formatedNumber(computedTotals.comisionISLR) }}
+                        </td>
+                        <td class="text-center">
+                            {{ formatedNumber(computedTotals.transferencia) }}
+                        </td>
+                        <td class="text-center">
+                            {{
+                                formatedNumber(computedTotals.comisionBancaria)
+                            }}
+                        </td>
+                    </div> -->
                 </tr>
             </tbody>
         </v-table>
