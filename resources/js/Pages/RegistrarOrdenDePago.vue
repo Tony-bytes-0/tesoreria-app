@@ -7,7 +7,10 @@ import { formatedNumber } from "@/helpers/numbers";
 import Navbar from "@/Layouts/Navbar.vue";
 import axios from "axios";
 import { ref, defineProps, computed } from "vue";
+import SvgIcon from "@jamescoyle/vue-icon";
+import { mdiCheckBold } from "@mdi/js";
 
+const successIconPath = mdiCheckBold;
 const validateForm = ref(true);
 const props = defineProps([
     "cuentasNaviarca",
@@ -55,6 +58,17 @@ const computedTotals = computed(() => {
     };
 });
 
+const showForm = computed(() => {
+    if (
+        properties.value.fecha &&
+        properties.value.tipo &&
+        selectedAccount.value.codigo_cuenta !== ""
+    ) {
+        return true;
+    } else {
+        return false;
+    }
+});
 const totalize = (key) => {
     let total = 0;
     if (items.value.length > 0) {
@@ -64,7 +78,6 @@ const totalize = (key) => {
     }
     return total;
 };
-
 
 const addToList = (newItem) => {
     if (selectedAccount.value.codigo_cuenta.length < 1 && validateForm.value) {
@@ -79,6 +92,28 @@ const addToList = (newItem) => {
 };
 const deleteItem = (targetId) => {
     items.value = items.value.filter((x) => x.id !== targetId);
+};
+
+const resetAccount = () => {
+    selectedAccount.value = {
+        banco_id: "",
+        codigo_cuenta: "",
+        moneda_id: "",
+        tipo_cuenta: "",
+        banco_nombre: "",
+    };
+};
+
+const resetForm = () => {
+    properties.value = {
+        fecha: "",
+        concepto: "",
+        tipo: "",
+        tasa: props.tasas.original.usd,
+        rif: "",
+    };
+    company.value = ''
+    resetAccount();
 };
 
 const accProps = (item) => {
@@ -102,7 +137,7 @@ const accProps = (item) => {
 };
 
 const selectAccGroup = (key) => {
-    selectedAccount.value = {};
+    resetAccount();
     company.value = key;
     switch (key) {
         case "naviarca":
@@ -137,6 +172,7 @@ const submit = async () => {
                         response.data.numero_orden_de_pago
                 );
                 items.value = [];
+                resetForm();
             });
     } catch (error) {
         staticError("Codigo de error: " + error.status);
@@ -160,7 +196,9 @@ const submit = async () => {
         <v-row dense class="ml-20 mr-20">
             <v-col md="3" align-self="center"
                 >Monto total a cancelar:
-                {{ formatedNumber(computedTotals.transferencia) + " Bs." }}</v-col
+                {{
+                    formatedNumber(computedTotals.transferencia) + " Bs."
+                }}</v-col
             >
 
             <v-col md="3" align-self="center"
@@ -206,7 +244,14 @@ const submit = async () => {
             }}</v-col>
         </v-row>
 
-        <v-divider :thickness="7">Datos de la cuenta</v-divider>
+        <v-divider :thickness="7">Datos de la Cuenta</v-divider>
+
+        <SvgIcon
+            type="mdi"
+            :path="successIconPath"
+            size="50"
+            v-if="showForm"
+        ></SvgIcon>
 
         <v-row class="m-2">
             <v-row align-content="center">
@@ -300,11 +345,15 @@ const submit = async () => {
 
             <v-col cols="3"></v-col>
         </v-row>
+
         <Formulario
             @addToList="addToList"
             @submit="submit"
             :validateForm="validateForm"
             :beneficiarios="props.beneficiarios"
+            :showForm="showForm"
+            :pagoElectronico="properties.tipo == 'Electronico'"
+            :canSubmit="items.length > 0"
         />
 
         <v-table height="300px" fixed-header>
@@ -324,15 +373,17 @@ const submit = async () => {
                     <td class="text-center"></td>
                     <td class="text-center"></td>
                     <td class="text-center"></td>
-                    <td class="text-center">{{ computedTotals.montoTotal }}</td>
                     <td class="text-center">
-                        {{ computedTotals.comisionISLR }}
+                        {{ formatedNumber(computedTotals.montoTotal) }}
                     </td>
                     <td class="text-center">
-                        {{ computedTotals.transferencia }}
+                        {{ formatedNumber(computedTotals.comisionISLR) }}
                     </td>
                     <td class="text-center">
-                        {{ computedTotals.comisionBancaria }}
+                        {{ formatedNumber(computedTotals.transferencia) }}
+                    </td>
+                    <td class="text-center">
+                        {{ formatedNumber(computedTotals.comisionBancaria) }}
                     </td>
                 </tr>
             </tbody>

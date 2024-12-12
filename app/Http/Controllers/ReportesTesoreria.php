@@ -43,7 +43,7 @@ class ReportesTesoreria extends Controller
 
     public function consultarUltimasOrdenes(Request $request)
     {
-        $ordenesArray = OrdenDePagoElectronico::with('beneficiario', 'cuenta_contable')->orderBy('id')->paginate(perPage: 20, page: 1);
+        $ordenesArray = OrdenDePagoElectronico::with('beneficiario', 'cuenta_contable')->orderBy('id', 'desc')->paginate(perPage: 50, page: 1);
         return response()->json([
             'items' => $ordenesArray,
         ], 201);

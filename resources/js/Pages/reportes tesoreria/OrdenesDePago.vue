@@ -7,7 +7,7 @@
         <v-container fluid>
             <form @submit.prevent="loadItems">
             <v-row align="center" justify="center">
-                <v-col cols="5">
+                <v-col cols="4">
                     <v-text-field
                         v-model="id_proceso"
                         class="custom-dark"
@@ -18,7 +18,7 @@
                     ><v-btn submit @click="loadItems">Buscar</v-btn>
                     </v-col
                 >
-                <v-col cols="2"><v-btn submit @click="loadItems(false)">ultimos registros</v-btn></v-col>
+                <!-- <v-col cols="2"><v-btn submit @click="loadItems(false)">ultimos registros</v-btn></v-col> -->
             </v-row>
             </form>
         </v-container>
@@ -112,7 +112,7 @@
             hide-default-footer
         ></v-data-table>
 
-        <v-pagination class="mt-10" :length="totalVisible" v-model="itemsPerPage" :total-visible="10" >asdasd</v-pagination>
+        <v-pagination class="mt-10" :length="visiblePagination" v-model="itemsPerPage" :total-visible="10" >asdasd</v-pagination>
 
         <h1>{{ selectedItems }}</h1>
     </Navbar>
@@ -156,10 +156,11 @@ const headers = [
     { title: "Nº", key: "id", align: "end" },
     { title: "Orden de pago", key: "id_proceso", align: "end" },
     { title: "RIF Empresa", align: "start", sortable: false, key: "rif" },
-    { title: "Nombre", key: "beneficiario[0].descripcion", align: "end" },
+    { title: "RIF Beneficiario", align: "start", sortable: false, key: "beneficiario.rif" },
+    { title: "Nombre", key: "beneficiario.descripcion", align: "end" },
     {
         title: "Número de cuenta",
-        key: "beneficiario[0].codigo_cuenta",
+        key: "beneficiario.codigo_cuenta",
         align: "end",
     },
     { title: "Monto total", key: "monto_total", align: "end" },
@@ -167,7 +168,7 @@ const headers = [
     { title: "Comisión bancaria", key: "comision_bancaria", align: "end" },
     { title: "Nº factura", key: "factura", align: "end" },
     { title: "Nº autorización", key: "autorizacion", align: "end" },
-    { title: "Cuenta contable", key: "cuenta_contable[0].descripcion", align: "end" },
+    { title: "Cuenta contable", key: "cuenta_contable.descripcion", align: "end" },
     { title: "Concepto", key: "concepto", align: "end" },
 ];
 //table data datos de la tabla
@@ -177,13 +178,10 @@ const search = ref("");
 const serverItems = ref([]);
 const loading = ref(false);
 const page = ref(1);
-const itemsPerPage = ref(10);
-const totalItems = ref(10);
-const totalVisible = computed(() => {
-    var pageLength = 1
-    while(pageLength < totalItems){
-        pageLength++
-    }
+const itemsPerPage = ref(100);
+const totalItems = ref(0);
+const visiblePagination = computed(() => {
+    var pageLength = page.value
     return pageLength
 });
 //const sortBy = ref([{ key: "name", order: "asc" }]);
@@ -192,7 +190,6 @@ const totalVisible = computed(() => {
 async function loadItems(last) {
     
     loading.value = true;
-    console.log('id_proceso values: ', id_proceso.value, typeof(id_proceso.value))
     axios({
         method: "GET",
         url: last ? "/api/consultar_ordenes_de_pago" : "/api/consultar_ordenes_de_pago_ultimas",
@@ -202,7 +199,6 @@ async function loadItems(last) {
             per_page: Number(itemsPerPage.value),
         },
     }).then((response) => {
-        console.log('OLD BUT GOLD', response.data.items)
         if (response.status == 204) {
             fastMsg('No existen registros con el numero: ' + id_proceso.value);
         } else {
@@ -254,6 +250,9 @@ const submit = async () => {
         loading.value = false;
     }
 };
+onMounted(async () => {
+    loadItems(false);
+})
 </script>
 
 <style>

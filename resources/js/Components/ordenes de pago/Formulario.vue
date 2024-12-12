@@ -3,8 +3,7 @@
     <v-divider :thickness="7">Datos de la orden de pago</v-divider>
     <v-form class="p-2" @submit.prevent>
         <v-row align="center">
-            <v-col cols="2"></v-col>
-
+            <v-col cols="2"><SvgIcon type="mdi" :path="successIconPath" size="50" v-if="!validateForm(ordenDePagoElectronico)"></SvgIcon></v-col>
             <v-col cols="4">
                 <v-autocomplete
                     label="Beneficiario"
@@ -13,6 +12,7 @@
                     item-value="descripcion"
                     :items="props.beneficiarios"
                     return-object
+                    :disabled="!props.showForm && props.validateForm"
                 >
                     <template v-slot:item="{ props, item }">
                         <v-list-item
@@ -33,16 +33,17 @@
                 <v-text-field
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.factura"
-                    label="Número de factura"
+                    :label="!props.pagoElectronico ? 'Número de factura' : 'Numero de personas'"
+                    :disabled="!props.showForm && props.validateForm"
                 ></v-text-field>
             </v-col>
 
             <v-col cols="2">
                 <v-text-field
                     class="custom-dark"
-                    type="number"
                     v-model="ordenDePagoElectronico.monto_total"
-                    label="Monto total"
+                    :label="props.pagoElectronico ? 'Total a pagar' : 'Monto total'"
+                    :disabled="!props.showForm && props.validateForm"
                 ></v-text-field>
             </v-col>
             <v-col cols="1"></v-col>
@@ -51,21 +52,26 @@
             <v-col cols="2"></v-col>
             <v-col cols="2">
                 <v-text-field
+                    v-if="!props.pagoElectronico"
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.retencion_islr"
                     label="Monto retención ISLR"
+                    :disabled="!props.showForm && props.validateForm"
                 ></v-text-field>
             </v-col>
 
             <v-col cols="2">
                 <v-text-field
+                v-if="!props.pagoElectronico"
                     class="custom-dark"
                     v-model="ordenDePagoElectronico.autorizacion"
                     label="Nº Autorización"
+                    :disabled="!props.showForm && props.validateForm"
                 ></v-text-field>
             </v-col>
             <v-col cols="2">
                 <v-text-field
+                    v-if="!props.pagoElectronico"
                     class="custom-dark custom-input"
                     v-model="transferencia"
                     label="Monto transferencia"
@@ -74,6 +80,7 @@
             </v-col>
             <v-col cols="2">
                 <v-text-field
+                    v-if="!props.pagoElectronico"
                     class="custom-dark"
                     v-model="comision_bancaria"
                     label="Comision bancaria"
@@ -82,7 +89,7 @@
             </v-col>
             <v-col cols="2"></v-col>
         </v-row>
-<!--         <v-row>
+         <v-row>
             <v-col cols="12">
                 <v-text-field
                     class="custom-dark"
@@ -90,7 +97,7 @@
                     label="Concepto ( opcional )"
                 ></v-text-field>
             </v-col>
-        </v-row> -->
+        </v-row>
 
         <v-row>
             <v-col
@@ -109,6 +116,7 @@
                 <v-btn
                     class="w-2/5 justify-center items-center m-2"
                     color="success"
+                    :disabled="!canSubmit"
                     @click="submit"
                 >
                     Procesar ordenes
@@ -116,17 +124,20 @@
             </v-col>
         </v-row>
 
-        <v-row> </v-row>
+        
     </v-form>
 </template>
 <script setup>
 import { computed, onMounted, ref } from "vue";
+import { staticError } from "../alerts/staticMessages";
+import SvgIcon from '@jamescoyle/vue-icon';
+import { mdiCheckBold } from '@mdi/js';
 import "vuetify/styles";
 import "vuetify";
-import { staticError } from "../alerts/staticMessages";
 
+const successIconPath = mdiCheckBold
 const emit = defineEmits(["addToList", "submit"]);
-const props = defineProps(["validateForm", "beneficiarios"]);
+const props = defineProps(["validateForm", "beneficiarios", "showForm", "pagoElectronico", "canSubmit"]);
 var ordenDePagoElectronico = ref({
     //fecha: "", datos ahora fuera del formulario
     //tipo: "",
@@ -158,14 +169,23 @@ const comision_bancaria = computed(() => {
     return Number(newValue.toFixed(2));
 });
 
+const canAddToList = computed(() => {
+
+})
+
 const validateForm = (item) => {
     var validationObject = Object.assign({}, item);
     delete validationObject.concepto; //propiedad no validable
     delete validationObject.retencion_islr; //propiedad no validable
+    delete validationObject.transferencia;
+    delete validationObject.autorizacion;
+    delete validationObject.comision_bancaria;
+    delete validationObject.transferencia;
 
     const notEmpty = (x) => {
         return x.length == 0;
     };
+    console.log('frenar el paso: ', Object.values(validationObject).some(notEmpty))
     return Object.values(validationObject).some(notEmpty);
 };
 
@@ -184,16 +204,13 @@ const handleAddToList = () => {
     if (validateForm(ordenDePagoElectronico.value) && props.validateForm) {
         staticError("Complete el formulario");
     } else {
-        console.log(
-            "al emitir este es el concepto: ",
-            ordenDePagoElectronico.value.concepto
-        );
         emit("addToList", {
             ...ordenDePagoElectronico.value,
             monto_total: Number(ordenDePagoElectronico.value.monto_total).toFixed(2),
             transferencia: transferencia.value,
             comision_bancaria: comision_bancaria.value,
-            id_beneficiario: id_beneficiario.value
+            id_beneficiario: id_beneficiario.value,
+            numero_personas: ordenDePagoElectronico.value.factura
         });
         resetForm();
     }
@@ -203,33 +220,7 @@ const submit = () => {
     console.log("formualario: ", ordenDePagoElectronico.value);
     emit("submit", { ...ordenDePagoElectronico.value });
 };
-//autocomplete component
 
-const accProps = (item) => {
-    return {
-        title: "example of title", // + " - " + item.codigo_cuenta,
-        subtitle: "subtitle",
-    };
-};
-const srcs = {
-    1: "https://cdn.vuetifyjs.com/images/lists/1.jpg",
-    2: "https://cdn.vuetifyjs.com/images/lists/2.jpg",
-    3: "https://cdn.vuetifyjs.com/images/lists/3.jpg",
-    4: "https://cdn.vuetifyjs.com/images/lists/4.jpg",
-    5: "https://cdn.vuetifyjs.com/images/lists/5.jpg",
-};
-const people = ref([
-    { name: "Sandra Adams", group: "Group 1", avatar: srcs[1] },
-    { name: "Ali Connors", group: "Group 1", avatar: srcs[2] },
-    { name: "Trevor Hansen", group: "Group 1", avatar: srcs[3] },
-    { name: "Tucker Smith", group: "Group 1", avatar: srcs[2] },
-    // { divider: true },
-    // { header: 'Group 2' },
-    { name: "Britta Holt", group: "Group 2", avatar: srcs[4] },
-    { name: "Jane Smith ", group: "Group 2", avatar: srcs[5] },
-    { name: "John Smith", group: "Group 2", avatar: srcs[1] },
-    { name: "Sandra Williams", group: "Group 2", avatar: srcs[3] },
-]);
 </script>
 
 <style scooped>
@@ -243,7 +234,7 @@ const people = ref([
 }
 .custom-dark input {
     color: white !important;
-    background-color: #3d3d3d;
+    background-color: #7a7a7a;
 }
 .custom-dark {
     color: gray !important;
