@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\CuentasBancariasController;
 use App\Http\Controllers\Tasa;
 use App\Models\Beneficiario_cuentas;
+use App\Models\CuentasBancaria;
 use App\Models\OrdenDePagoElectronico;
 use App\Models\ProcesoOrdenDePago;
 use Illuminate\Http\Request;
@@ -18,18 +19,15 @@ class OrdenDePagoController extends Controller
     public function viewRegistrarOrdenDePago()
     {
         //$cuentas_bancarias = CuentasBancariasController::consultar_cuentas_bancarias(); //llamada estatica, error //instanciar objeto, luego llamar sus metodos
-        $cuentas = new CuentasBancariasController;
         $tasasInstance = new Tasa;
         $beneficiario_cuentas = Beneficiario_cuentas::all();
-
         $tasas = $tasasInstance->consultar_tasa();
-        $cuentasNaviarca = $cuentas->consultar_cuentas_bancarias_naviarca();
-        $cuentasGc = $cuentas->consultar_cuentas_bancarias_gc();
-
+        $naviarca = CuentasBancaria::where('empresa_id', '=', 'J080056043')->get();
+        $grancacique = CuentasBancaria::where('empresa_id', '=', 'J303876056')->get();
 
         return Inertia::render('RegistrarOrdenDePago', [
-            'cuentasNaviarca' => $cuentasNaviarca,
-            'cuentasGc' => $cuentasGc,
+            'cuentasNaviarca' => $naviarca,
+            'cuentasGc' => $grancacique,
             'tasas' => $tasas,
             'beneficiarios' => $beneficiario_cuentas
         ]);
@@ -53,7 +51,7 @@ class OrdenDePagoController extends Controller
             'properties.concepto' => 'string|nullable',
             'properties.rif' => 'required|string',
             'properties.fecha' => 'required|date',
-            'properties.tipo' => 'required|string',
+            //'properties.tipo' => 'string|nulla',
             'properties.tasa' => 'required|numeric',
             'properties.banco_nombre' => 'required|string',
             'properties.codigo_cuenta' => 'required|string',
@@ -62,7 +60,7 @@ class OrdenDePagoController extends Controller
 
 
         $transactionResult = DB::transaction(function () use ($validatedData) {
- 
+
             $totalSum = 0; // para agregarle un monto total al proceso orden de pago, deberia tener los demas totales
             foreach ($validatedData['items'] as $value) {
                 if (isset($value['transferencia']) && is_numeric($value['transferencia'])) {
@@ -71,13 +69,13 @@ class OrdenDePagoController extends Controller
                     //
                 }
             }
-            
+
             $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'concepto' => $validatedData['properties']['concepto']]);
 
             $ordenDePagos = collect($validatedData["items"])->map(function ($item) use ($procesoOrdenes, $validatedData) {
                 $item['id_proceso'] = $procesoOrdenes['id'];
-                unset($validatedData['properties']['concepto']);//elimino el concepto, se repite en items y properties
-                
+                unset($validatedData['properties']['concepto']); //elimino el concepto, se repite en items y properties
+
                 return OrdenDePagoElectronico::create(array_merge($item, $validatedData['properties']));
             });
 
@@ -106,7 +104,7 @@ class OrdenDePagoController extends Controller
         //dd($updatedValues);
         return response()->json([
             'message' => 'mensaje estatic',
-            
+
         ], 201);
     }
 }

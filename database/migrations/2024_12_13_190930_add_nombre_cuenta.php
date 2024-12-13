@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('proceso_orden_de_pagos', function (Blueprint $table) {
-            
+        schema::table('cuentas_bancarias', function(Blueprint $table){
+            $table->string('banco_nombre')->nullable();
         });
     }
 
@@ -21,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        schema::table('cuentas_bancarias', function (Blueprint $table) {
+            $table->dropColumn('banco_nombre');
+        });
     }
 };
