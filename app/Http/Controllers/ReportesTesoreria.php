@@ -28,10 +28,8 @@ class ReportesTesoreria extends Controller
             'per_page' => 'numeric',
             'page' => 'numeric',
         ]);
-        //>with('beneficiario', 'cuenta_contable')->where('id_proceso', '=', $validated['id_proceso'])->orderBy('id');
-        //$ordenesArray = OrdenDePagoElectronico::with('beneficiario', 'cuenta_contable')->where('id_proceso', '=', $validated['id_proceso'])->orderBy('id')->paginate(perPage: $validated['per_page'], page: $validated['page']);
         $ordenesArray = OrdenDePagoElectronico::with('beneficiario', 'cuenta_contable')->where('id_proceso', '=', $validated['id_proceso'])->orderBy('id')->orderBy('id')->paginate(perPage: $validated['per_page'], page: $validated['page']);
-        $conceptoGeneral = ProcesoOrdenDePago::where('id', '=', 'id_proceso');
+        $conceptoGeneral = ProcesoOrdenDePago::find($validated['id_proceso']);
         if ($ordenesArray->isEmpty()) {
             return response()->json([
                 'message' => 'No existe el proceso orden de pago numero: ' . $validated['id_proceso'],
@@ -39,7 +37,7 @@ class ReportesTesoreria extends Controller
         }
         return response()->json([
             'items' => $ordenesArray,
-            'concepto'
+            'proceso_orden_de_pago' => $conceptoGeneral
         ], 201);
     }
 

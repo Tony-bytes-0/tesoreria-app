@@ -1,28 +1,27 @@
 <template>
     <Navbar>
-        <div class="mt-20 ml-5">
+        <div class="mt-20 ml-5 printArea">
             <!-- <h1>Reporte ordenes de pago</h1> -->
         </div>
         <!-- <DateRange @sendDate="sendDate" /> -->
         <v-container fluid>
             <form @submit.prevent="loadItems">
-            <v-row align="center" justify="center">
-                <v-col cols="4">
-                    <v-text-field
-                        v-model="id_proceso"
-                        class="custom-dark"
-                        label="Numero de proceso de pago"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="2" align-self="center"
-                    ><v-btn submit @click="loadItems">Buscar</v-btn>
-                    </v-col
-                >
-                <!-- <v-col cols="2"><v-btn submit @click="loadItems(false)">ultimos registros</v-btn></v-col> -->
-            </v-row>
+                <v-row justify="center">
+                    <v-col cols="4">
+                        <v-text-field
+                            v-model="id_proceso"
+                            class="custom-dark"
+                            label="Numero de proceso de pago"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="2" align-self="center"
+                        ><v-btn submit @click="loadItems">Buscar</v-btn>
+                    </v-col>
+                    <!-- <v-col cols="2"><v-btn submit @click="loadItems(false)">ultimos registros</v-btn></v-col> -->
+                </v-row>
             </form>
         </v-container>
-
+        <!-- aqui va la modal -->
         <v-row class="mb-10">
             <v-col>
                 <v-dialog max-width="500" class="z-10">
@@ -99,53 +98,136 @@
                 </v-dialog>
             </v-col>
         </v-row>
+        <!-- aqui va la modal -->
+        <v-row class="mt-10 mb-10">
+            <v-col cols="3" class="border text-">logo</v-col>
+            <v-col cols="6" class="border text-xl text-center"
+                >ORDEN DE PAGO ELECTRÓNICO DE PROVEEDORES</v-col
+            >
+            <v-col cols="3" class="border">
+                <v-col cols="12" class="border"
+                    >Fecha: {{ reportData.fecha_creacion }}</v-col
+                >
+                <v-col cols="12" class="border"
+                    >Referencia: {{ reportData.referencia }}</v-col
+                >
+                <v-col cols="12" class="border"
+                    >Tasa: {{ reportData.tasa }}</v-col
+                >
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col cols="3" class="border">Empresa: </v-col>
+            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="5"></v-col>
+
+            <v-col cols="3" class="border">Banco Emisor: </v-col>
+            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="5"></v-col>
+
+            <v-col cols="3" class="border">Tipo de cuenta: </v-col>
+            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="5"></v-col>
+
+            <v-col cols="3" class="border">Nº de cuenta: </v-col>
+            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="5"></v-col>
+
+            <v-col cols="3" class="border">Fecha valor: </v-col>
+            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="5"></v-col>
+
+            <v-col cols="3" class="border">Nº de registro: </v-col>
+            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="5"></v-col>
+        </v-row>
+
         <v-data-table
-            class="pagination"
+            class="pagination mt-10"
             v-model="selectedItems"
             :headers="headers"
             :items="serverItems"
             item-value="id"
             :items-per-page="itemsPerPage"
             return-object
-            show-select
             hover
             hide-default-footer
         >
-    <template v-slot:item = {item}>
-        <tr>
-            <td class="text-center border">uno</td>
-            <td class="text-center border">uno</td>
-            <td class="text-center border">uno</td>
-            <td class="text-center border">uno</td>
-            <td class="text-center border">uno</td>
-            <td class="text-center border">uno</td>
-            <td class="text-center border">uno</td>
-            <td class="text-center border">uno</td>
-            <td class="text-center border">uno</td>
-            <td class="text-center border">uno</td>
-        </tr>
-    </template>
-    </v-data-table>
-
-        <v-pagination class="mt-10" :length="visiblePagination" v-model="itemsPerPage" :total-visible="10" >asdasd</v-pagination>
-
-        <h1>{{ selectedItems }}</h1>
+            <template v-slot:item="{ item }">
+                <tr>
+                    <td class="text-center border">{{ item.id }}</td>
+                    <td class="text-center border">
+                        {{ item.beneficiario.descripcion }}
+                    </td>
+                    <td class="text-center border">{{ item.factura }}</td>
+                    <td class="text-center border">
+                        {{ formatedNumber(item.monto_total) }}
+                    </td>
+                    <td class="text-center border">
+                        {{ item.retencion_islr }}
+                    </td>
+                    <td class="text-center border">
+                        {{ formatedNumber(item.transferencia) }}
+                    </td>
+                    <td class="text-center border">
+                        {{ formatedNumber(item.comision_bancaria) }}
+                    </td>
+                    <td class="text-center border">{{ item.autorizacion }}</td>
+                    <!-- <td class="text-center border">{{ item.concepto }}</td> -->
+                    <td class="text-center border"></td>
+                </tr>
+            </template>
+        </v-data-table>
+        <p class="mt-10 ml-5 bold">Concepto: {{ reportData.concepto }}</p>
+        <v-row class="mt-15" justify="center">
+            <v-col cols="2">Monto total: {{ formatedNumber(reportData.total) }}</v-col>
+            <v-col cols="2">Monto total Retencion:</v-col>
+            <v-col cols="2">Monto transferencia:</v-col>
+            <v-col cols="2">Comisión bancaria:</v-col>
+            <v-col cols="2"
+                >Equivalente en divisas:
+                {{
+                    formatedNumber(
+                        parseFloat(reportData.total) /
+                            parseFloat(reportData.tasa)
+                    )
+                }} $</v-col
+            >
+        </v-row>
+        <v-row class="mt-10" justify="center">
+            <v-col cols="2">Revisado por tesoreria: </v-col>
+            <v-col cols="2">Firmas autorizadas:</v-col>
+            <v-col cols="2">REG. Final cuentas por pagar:</v-col>
+        </v-row>
+        <!-- <v-pagination
+            class="mt-10"
+            :length="visiblePagination"
+            v-model="itemsPerPage"
+            :total-visible="10"
+            >asdasd</v-pagination
+        > -->
+        <!-- <h1>{{ selectedItems }}</h1> -->
     </Navbar>
 </template>
 
 <script setup>
-import DateRange from "@/Components/DateRange.vue";
 import Navbar from "@/Layouts/Navbar.vue";
 import axios from "axios";
 import "vuetify/styles";
 import "vuetify";
 import { computed, onMounted, ref, watch } from "vue";
-import { fastMsg, staticError, staticSucces } from "@/Components/alerts/staticMessages";
+import { fastMsg } from "@/Components/alerts/staticMessages";
+import { formatedDate, formatedNumber } from "@/helpers/numbers";
 
 const props = defineProps(["ordenesDePago", "cuentasContables"]);
-var date = ref({
-    initialDate: "",
-    finalDate: "",
+const reportData = ref({
+    referencia: "",
+    fecha_creacion: "",
+    tasa: "",
+    total: "",
+    equivalente_divisas: "",
+    concepto: "",
 });
 
 var selectedAccount = ref({
@@ -160,31 +242,50 @@ const modalResponseMessage = ref({
     initialValue: true,
 });
 
-const sendDate = (targetValue) => {
-    loadItems({ page: 1, itemsPerPage: itemsPerPage.value });
-    date.value = targetValue;
-    console.log(targetValue);
-};
-
-
 const headers = [
-    { title: "Nº", key: "id", align: "end" },
-    { title: "Orden de pago", key: "id_proceso", align: "end" },
-    { title: "RIF Empresa", align: "start", sortable: false, key: "rif" },
-    { title: "RIF Beneficiario", align: "start", sortable: false, key: "beneficiario.rif" },
-    { title: "Nombre", key: "beneficiario.descripcion", align: "end" },
+    { title: "Nº de referencia", key: "id", align: "center" },
     {
-        title: "Número de cuenta",
-        key: "beneficiario.codigo_cuenta",
-        align: "end",
+        title: "Nombre del beneficiario",
+        key: "id_proceso",
+        align: "center",
+        sortable: false,
     },
-    { title: "Monto total", key: "monto_total", align: "end" },
-    { title: "Transferencia", key: "transferencia", align: "end" },
-    { title: "Comisión bancaria", key: "comision_bancaria", align: "end" },
-    { title: "Nº factura", key: "factura", align: "end" },
-    { title: "Nº autorización", key: "autorizacion", align: "end" },
-    { title: "Cuenta contable", key: "cuenta_contable.descripcion", align: "end" },
-    { title: "Concepto", key: "concepto", align: "end" },
+    { title: "Nº de facturas", align: "center", sortable: false, key: "rif" },
+    {
+        title: "Monto total",
+        align: "center",
+        key: "monto_total",
+    },
+    {
+        title: "Monto retencion ISLR",
+        key: "retencion_islr",
+        align: "center",
+    },
+    {
+        title: "Monto transferencia",
+        key: "transferencia",
+        align: "center",
+    },
+    { title: "Comision bancaria", key: "monto_total", align: "center" },
+    {
+        title: "Nº autorización",
+        key: "transferencia",
+        align: "center",
+        sortable: false,
+    },
+    /*
+    {
+        title: "Concepto",
+        key: "concepto",
+        align: "center",
+        sortable: false,
+    },
+    */
+    {
+        title: "Nº registro contable",
+        align: "center",
+        sortable: false,
+    },
 ];
 //table data datos de la tabla
 var id_proceso = ref("");
@@ -196,18 +297,19 @@ const page = ref(1);
 const itemsPerPage = ref(100);
 const totalItems = ref(0);
 const visiblePagination = computed(() => {
-    var pageLength = page.value
-    return pageLength
+    var pageLength = page.value;
+    return pageLength;
 });
 //const sortBy = ref([{ key: "name", order: "asc" }]);
 //const sortByDesc = computed(() => sortBy.value[0]?.order === "desc");
 
 async function loadItems(last) {
-    
     loading.value = true;
     axios({
         method: "GET",
-        url: last ? "/api/consultar_ordenes_de_pago" : "/api/consultar_ordenes_de_pago_ultimas",
+        url: last
+            ? "/api/consultar_ordenes_de_pago"
+            : "/api/consultar_ordenes_de_pago_ultimas",
         params: {
             id_proceso: Number(id_proceso.value),
             page: Number(page.value),
@@ -215,10 +317,20 @@ async function loadItems(last) {
         },
     }).then((response) => {
         if (response.status == 204) {
-            fastMsg('No existen registros con el numero: ' + id_proceso.value);
+            fastMsg("No existen registros con el numero: " + id_proceso.value);
         } else {
+            const proceso = response.data.proceso_orden_de_pago;
             serverItems.value = response.data.items.data;
-            totalItems.value = response.data.items
+            totalItems.value = response.data.items;
+            reportData.value = {
+                referencia: proceso ? proceso.id : "",
+                fecha_creacion: proceso ? formatedDate(proceso.created_at) : "",
+                tasa: response.data.items.data[0].tasa,
+                concepto: response.data.proceso_orden_de_pago
+                    ? response.data.proceso_orden_de_pago.concepto
+                    : "",
+                total: proceso ? proceso.total : "",
+            };
         }
     });
     loading.value = false;
@@ -234,7 +346,7 @@ watch(search, () => {
 
 const submit = async () => {
     const ordenesArray = selectedItems.value.map((e) => e.id);
-    console.log("en submit, ordenes array", ordenesArray);
+    //console.log("en submit, ordenes array", ordenesArray);
     //console.log("datos a enviar: ", items.value);
     loading.value = true;
     try {
@@ -266,8 +378,9 @@ const submit = async () => {
     }
 };
 onMounted(async () => {
+    //leer los ultimos 20 registros por defecto, ordenes de pago electronico order by ids
     loadItems(false);
-})
+});
 </script>
 
 <style>
@@ -303,5 +416,21 @@ onMounted(async () => {
 }
 .custom-dark {
     color: gray !important;
+}
+/* thead th div span {
+    text-align: center;
+    text-align: justify;
+} */
+@media print {
+    body * {
+        font-size: 7px; /* Reduces all text sizes */
+        line-height: 1; /* Adjusts line spacing */
+        padding: 0; /* Removes default padding */
+        margin: 0; /* Removes default margins */
+    }
+    @page {
+        size: auto;
+        margin: 5;
+    }
 }
 </style>
