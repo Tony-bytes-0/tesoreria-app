@@ -201,7 +201,6 @@ const submit = async () => {
         <v-row dense class="ml-20 mr-20">
             <v-col md="3" align-self="center"
                 >Monto total a cancelar:
-                <h1>{{ props.cuentasNaviarca[0] }}</h1>
                 {{
                     formatedNumber(computedTotals.transferencia) + " Bs."
                 }}</v-col

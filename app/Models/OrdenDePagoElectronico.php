@@ -37,7 +37,7 @@ class OrdenDePagoElectronico extends Model
     {
         return $this->belongsTo(Beneficiario_cuentas::class, 'id_beneficiario', 'id');
     }
-    public function id_proceso()
+    public function proceso_id()
     {
         return $this->hasMany(ProcesoOrdenDePago::class);
     }

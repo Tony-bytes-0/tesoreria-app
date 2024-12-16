@@ -51,7 +51,7 @@ class OrdenDePagoController extends Controller
             'properties.concepto' => 'string|nullable',
             'properties.rif' => 'required|string',
             'properties.fecha' => 'required|date',
-            //'properties.tipo' => 'string|nulla',
+            'properties.tipo' => 'required|string',
             'properties.tasa' => 'required|numeric',
             'properties.banco_nombre' => 'required|string',
             'properties.codigo_cuenta' => 'required|string',
