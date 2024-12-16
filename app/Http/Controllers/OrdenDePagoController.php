@@ -38,7 +38,7 @@ class OrdenDePagoController extends Controller
         $validatedData = $request->validate([
             'items' => 'array|min:1',
 
-            'items.*.id_beneficiario' => 'required|numeric',
+            'items.*.beneficiario_id' => 'required|numeric',
             'items.*.factura' => 'required|string|nullable',
             'items.*.monto_total' => 'required|string',
             'items.*.retencion_islr' => 'string|nullable',
@@ -53,9 +53,10 @@ class OrdenDePagoController extends Controller
             'properties.fecha' => 'required|date',
             'properties.tipo' => 'required|string',
             'properties.tasa' => 'required|numeric',
-            'properties.banco_nombre' => 'required|string',
-            'properties.codigo_cuenta' => 'required|string',
-            'properties.tipo_cuenta' => 'string',
+            'properties.cuenta_bancaria_id' => 'required|numeric'
+            //'properties.banco_nombre' => 'required|string',
+            //'properties.codigo_cuenta' => 'required|string',
+            //'properties.tipo_cuenta' => 'string',
         ]);
 
 
@@ -70,10 +71,11 @@ class OrdenDePagoController extends Controller
                 }
             }
 
-            $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'concepto' => $validatedData['properties']['concepto']]);
+            $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'concepto' => $validatedData['properties']['concepto'] , 'secuencia' => '1']);
 
             $ordenDePagos = collect($validatedData["items"])->map(function ($item) use ($procesoOrdenes, $validatedData) {
-                $item['id_proceso'] = $procesoOrdenes['id'];
+                $item['proceso_id'] = $procesoOrdenes['id'];
+                $item['secuencia'] = '1';
                 unset($validatedData['properties']['concepto']); //elimino el concepto, se repite en items y properties
 
                 return OrdenDePagoElectronico::create(array_merge($item, $validatedData['properties']));
@@ -93,13 +95,13 @@ class OrdenDePagoController extends Controller
     public function asignarCuentaContable(Request $request)
     {
         $validatedData = $request->validate([
-            'id_ordenes' => 'array|min:1',
-            'id_cuenta_contable' => 'required | numeric'
+            'ordenes_id' => 'array|min:1',
+            'cuenta_contable_id' => 'required | numeric'
         ]);
-        $updatedValues = collect($validatedData['id_ordenes'])->map(function ($item) use ($validatedData) {
+        $updatedValues = collect($validatedData['ordenes_id'])->map(function ($item) use ($validatedData) {
 
-            //return OrdenDePagoElectronico::get()->whereIn('id', $item); //->update(['id_cuenta_contable' => $validatedData['id_cuenta_contable']]);
-            return OrdenDePagoElectronico::where('id', $item)->update(['id_cuenta_contable' => $validatedData['id_cuenta_contable']]);
+            //return OrdenDePagoElectronico::get()->whereIn('id', $item); //->update(['cuenta_contable_id' => $validatedData['cuenta_contable_id']]);
+            return OrdenDePagoElectronico::where('id', $item)->update(['cuenta_contable_id' => $validatedData['cuenta_contable_id']]);
         });
         //dd($updatedValues);
         return response()->json([

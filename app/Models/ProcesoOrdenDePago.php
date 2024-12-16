@@ -10,7 +10,7 @@ class ProcesoOrdenDePago extends Model
         'total',
         //'numero_orden_de_pago',
         'concepto',
-        'numero_orden_de_pago',
+        'secuencia',
     ];
     public function proceso_id()
     {

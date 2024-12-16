@@ -9,7 +9,7 @@
                 <v-row justify="center">
                     <v-col cols="4">
                         <v-text-field
-                            v-model="id_proceso"
+                            v-model="proceso_id"
                             class="custom-dark"
                             label="Numero de proceso de pago"
                         ></v-text-field>
@@ -158,7 +158,7 @@
                 <tr>
                     <td class="text-center border">{{ item.id }}</td>
                     <td class="text-center border">
-                        {{ item.beneficiario.descripcion }}
+                        <!-- {{ item.beneficiario.descripcion }} -->
                     </td>
                     <td class="text-center border">{{ item.factura }}</td>
                     <td class="text-center border">
@@ -246,7 +246,7 @@ const headers = [
     { title: "Nº de referencia", key: "id", align: "center" },
     {
         title: "Nombre del beneficiario",
-        key: "id_proceso",
+        key: "proceso_id",
         align: "center",
         sortable: false,
     },
@@ -288,7 +288,7 @@ const headers = [
     },
 ];
 //table data datos de la tabla
-var id_proceso = ref("");
+var proceso_id = ref("");
 const selectedItems = ref([]);
 const search = ref("");
 const serverItems = ref([]);
@@ -311,13 +311,13 @@ async function loadItems(last) {
             ? "/api/consultar_ordenes_de_pago"
             : "/api/consultar_ordenes_de_pago_ultimas",
         params: {
-            id_proceso: Number(id_proceso.value),
+            proceso_id: Number(proceso_id.value),
             page: Number(page.value),
             per_page: Number(itemsPerPage.value),
         },
     }).then((response) => {
         if (response.status == 204) {
-            fastMsg("No existen registros con el numero: " + id_proceso.value);
+            fastMsg("No existen registros con el numero: " + proceso_id.value);
         } else {
             const proceso = response.data.proceso_orden_de_pago;
             serverItems.value = response.data.items.data;

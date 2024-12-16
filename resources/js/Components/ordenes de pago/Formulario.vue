@@ -151,7 +151,7 @@ var ordenDePagoElectronico = ref({
     concepto: "",
 });
 
-const id_beneficiario = computed(() => {
+const beneficiario_id = computed(() => {
     return ordenDePagoElectronico.value.beneficiario.id
 })
 
@@ -206,7 +206,7 @@ const handleAddToList = () => {
             monto_total: Number(ordenDePagoElectronico.value.monto_total).toFixed(2),
             transferencia: transferencia.value,
             comision_bancaria: comision_bancaria.value,
-            id_beneficiario: id_beneficiario.value,
+            beneficiario_id: beneficiario_id.value,
             numero_personas: ordenDePagoElectronico.value.factura
         });
         resetForm();

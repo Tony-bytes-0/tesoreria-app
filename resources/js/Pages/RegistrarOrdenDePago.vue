@@ -44,6 +44,7 @@ var properties = ref({
 });
 
 var selectedAccount = ref({
+    id:"",
     banco_id: "",
     codigo_cuenta: "",
     moneda_id: "",
@@ -101,6 +102,7 @@ const deleteItem = (targetId) => {
 
 const resetAccount = () => {
     selectedAccount.value = {
+        id:"",
         banco_id: "",
         codigo_cuenta: "",
         moneda_id: "",
@@ -127,8 +129,8 @@ const accProps = (item) => {
         subtitle:
             item.banco_id +
             " - " +
-            item.tipo_cuenta +
-            " - " +
+/*             item.tipo_cuenta +
+            " - " + */
             item.codigo_cuenta,
         value: {
             id: item.id,
@@ -169,7 +171,7 @@ const submit = async () => {
         const response = await axios
             .post("/api/registrar_orden_de_pago", {
                 items: items.value,
-                properties: { ...properties.value, ...selectedAccount.value },
+                properties: { ...properties.value, cuenta_bancaria_id: selectedAccount.value.id },
             })
             .then((response) => {
                 staticSucces(
@@ -318,7 +320,6 @@ const submit = async () => {
                         :disabled="items.length > 0"
                     ></v-select>
                 </v-col>
-
                 <v-col cols="6" class="align-bottom justify-end mt-5">
                     <v-select
                         v-model="properties.tipo"
