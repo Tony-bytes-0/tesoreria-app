@@ -15,3 +15,13 @@ export const formatedDate = (date) => {
 
     return dd + "/" + mm + "/" + yyyy;
 }
+
+export const totalize = (key) => {
+    let total = 0;
+    if (items.value.length > 0) {
+        items.value.forEach((x) => {
+            total += +x[key];
+        });
+    }
+    return total;
+};

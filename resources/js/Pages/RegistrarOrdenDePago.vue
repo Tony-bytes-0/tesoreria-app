@@ -345,6 +345,7 @@ const submit = async () => {
                     class="custom-dark"
                     label="Concepto ( opcional )"
                     v-model="properties.concepto"
+                    :disabled="items.length > 0"
                 ></v-text-field>
             </v-col>
 

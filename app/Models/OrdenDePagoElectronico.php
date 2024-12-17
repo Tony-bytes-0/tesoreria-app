@@ -35,20 +35,20 @@ class OrdenDePagoElectronico extends Model
         //'perPage', 'page'
     ];
 
-    public function beneficiario_cuenta()
+    public function beneficiario()
     {
         return $this->belongsTo(Beneficiario_cuentas::class);
     }
-    public function proceso_id()
+    public function proceso()
     {
-        return $this->hasMany(ProcesoOrdenDePago::class);
+        return $this->hasMany(ProcesoOrdenDePago::class, 'id', 'proceso_id');
+    }
+    public function cuenta_bancaria()
+    {
+        return $this->belongsTo(CuentasBancaria::class );
     }
     public function cuenta_contable()
     {
         return $this->belongsTo(CuentasContable::class );
-    }
-    public function cuentas_bancarias()
-    {
-        return $this->belongsTo(CuentasBancaria::class );
     }
 }

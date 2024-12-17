@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class ProcesoOrdenDePago extends Model
 {
     protected $fillable = [
-        'total',
         //'numero_orden_de_pago',
         'concepto',
         'secuencia',
+        'monto_total',
+        'transferencia',
+        'comision_bancaria',
+        'retencion_islr',
+        'rif'
+
     ];
     public function proceso_id()
     {

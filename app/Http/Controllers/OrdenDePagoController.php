@@ -53,30 +53,47 @@ class OrdenDePagoController extends Controller
             'properties.fecha' => 'required|date',
             'properties.tipo' => 'required|string',
             'properties.tasa' => 'required|numeric',
-            'properties.cuenta_bancaria_id' => 'required|numeric'
-            //'properties.banco_nombre' => 'required|string',
-            //'properties.codigo_cuenta' => 'required|string',
-            //'properties.tipo_cuenta' => 'string',
+            'properties.cuenta_bancaria_id' => 'required|numeric',
         ]);
 
 
         $transactionResult = DB::transaction(function () use ($validatedData) {
+            
+            $totalTransferencia = 0;
+            $totalMontoTotal = 0;
+            $totalRetencionISLR = 0;
+            $totalComisionBancaria = 0;
 
-            $totalSum = 0; // para agregarle un monto total al proceso orden de pago, deberia tener los demas totales
             foreach ($validatedData['items'] as $value) {
                 if (isset($value['transferencia']) && is_numeric($value['transferencia'])) {
-                    $totalSum += $value['transferencia'];
-                } else {
-                    //
+                    $totalTransferencia += (float)$value['transferencia'];
+                }
+                if (isset($value['monto_total']) && is_numeric($value['monto_total'])) {
+                    $totalMontoTotal += (float)$value['monto_total'];
+                }
+                if (isset($value['retencion_islr']) && is_numeric($value['retencion_islr'])) {
+                    $totalRetencionISLR += (float)$value['retencion_islr'];
+                }
+                if (isset($value['comision_bancaria']) && is_numeric($value['comision_bancaria'])) {
+                    $totalComisionBancaria += (float)$value['comision_bancaria'];
                 }
             }
 
-            $procesoOrdenes = ProcesoOrdenDePago::create(['total' => $totalSum, 'concepto' => $validatedData['properties']['concepto'] , 'secuencia' => '1']);
+            $procesoOrdenes = ProcesoOrdenDePago::create([
+                'rif' => $validatedData['properties']['rif'],
+                'transferencia' => $totalTransferencia, 
+                'monto_total' => $totalMontoTotal,
+                'retencion_islr' => $totalRetencionISLR,
+                'comision_bancaria' => $totalComisionBancaria,
+                'concepto' => $validatedData['properties']['concepto'], 
+                'secuencia' => '1'
+            ]);
 
             $ordenDePagos = collect($validatedData["items"])->map(function ($item) use ($procesoOrdenes, $validatedData) {
                 $item['proceso_id'] = $procesoOrdenes['id'];
                 $item['secuencia'] = '1';
                 unset($validatedData['properties']['concepto']); //elimino el concepto, se repite en items y properties
+                unset($validatedData['properties']['cuenta_bancaria_id']); //se repite en items y properties
 
                 return OrdenDePagoElectronico::create(array_merge($item, $validatedData['properties']));
             });

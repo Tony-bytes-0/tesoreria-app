@@ -119,27 +119,27 @@
 
         <v-row>
             <v-col cols="3" class="border">Empresa: </v-col>
-            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="4" class="border"></v-col>
             <v-col cols="5"></v-col>
 
             <v-col cols="3" class="border">Banco Emisor: </v-col>
-            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="4" class="border"></v-col>
             <v-col cols="5"></v-col>
 
             <v-col cols="3" class="border">Tipo de cuenta: </v-col>
-            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="4" class="border"></v-col>
             <v-col cols="5"></v-col>
 
             <v-col cols="3" class="border">Nº de cuenta: </v-col>
-            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="4" class="border"></v-col>
             <v-col cols="5"></v-col>
 
             <v-col cols="3" class="border">Fecha valor: </v-col>
-            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="4" class="border"></v-col>
             <v-col cols="5"></v-col>
 
             <v-col cols="3" class="border">Nº de registro: </v-col>
-            <v-col cols="4" class="border">asdasd</v-col>
+            <v-col cols="4" class="border"></v-col>
             <v-col cols="5"></v-col>
         </v-row>
 
@@ -158,7 +158,7 @@
                 <tr>
                     <td class="text-center border">{{ item.id }}</td>
                     <td class="text-center border">
-                        <!-- {{ item.beneficiario.descripcion }} -->
+                        {{ item.beneficiario.descripcion }}
                     </td>
                     <td class="text-center border">{{ item.factura }}</td>
                     <td class="text-center border">
@@ -182,9 +182,9 @@
         <p class="mt-10 ml-5 bold">Concepto: {{ reportData.concepto }}</p>
         <v-row class="mt-15" justify="center">
             <v-col cols="2">Monto total: {{ formatedNumber(reportData.total) }}</v-col>
-            <v-col cols="2">Monto total Retencion:</v-col>
-            <v-col cols="2">Monto transferencia:</v-col>
-            <v-col cols="2">Comisión bancaria:</v-col>
+            <v-col cols="2">Rentención ISLR: {{ formatedNumber(reportData.total) }}</v-col>
+            <v-col cols="2">Transferencia: {{ formatedNumber(reportData.total) }}</v-col>
+            <v-col cols="2">Comisión bancaria: {{ formatedNumber(reportData.total) }}</v-col>
             <v-col cols="2"
                 >Equivalente en divisas:
                 {{
@@ -194,6 +194,7 @@
                     )
                 }} $</v-col
             >
+            
         </v-row>
         <v-row class="mt-10" justify="center">
             <v-col cols="2">Revisado por tesoreria: </v-col>
@@ -218,7 +219,7 @@ import "vuetify/styles";
 import "vuetify";
 import { computed, onMounted, ref, watch } from "vue";
 import { fastMsg } from "@/Components/alerts/staticMessages";
-import { formatedDate, formatedNumber } from "@/helpers/numbers";
+import { formatedDate, formatedNumber, totalize } from "@/helpers/numbers";
 
 const props = defineProps(["ordenesDePago", "cuentasContables"]);
 const reportData = ref({
@@ -226,9 +227,11 @@ const reportData = ref({
     fecha_creacion: "",
     tasa: "",
     total: "",
+
     equivalente_divisas: "",
     concepto: "",
 });
+
 
 var selectedAccount = ref({
     id: "",
@@ -319,6 +322,7 @@ async function loadItems(last) {
         if (response.status == 204) {
             fastMsg("No existen registros con el numero: " + proceso_id.value);
         } else {
+            console.log(response.data)
             const proceso = response.data.proceso_orden_de_pago;
             serverItems.value = response.data.items.data;
             totalItems.value = response.data.items;
