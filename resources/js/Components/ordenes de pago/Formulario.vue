@@ -12,8 +12,19 @@
                         validateFormelectronico(formData) &&
                         props.pagoElectronico
                     "
-                ></SvgIcon
-            ></v-col>
+                >
+                </SvgIcon>
+                <SvgIcon
+                    type="mdi"
+                    :path="successIconPath"
+                    size="50"
+                    v-if="
+                        validateFormProveedores(formData) &&
+                        !props.pagoElectronico
+                    "
+                >
+                </SvgIcon>
+            </v-col>
             <v-col cols="4">
                 <h1 class="p-2">Beneficiario</h1>
                 <v-autocomplete
@@ -221,9 +232,9 @@ const validateFormelectronico = (item) => {
         return x.length == 0;
     };
     const atLeastOneCharacter = !Object.values(validationObject).some(notEmpty); //valida completitud
-    const onlyNumbers = validateNumbersAndCommas([
-        String(validationObject.monto_total),
-    ]); //valida solo numeros y comas
+    const onlyNumbers = validateNumbersAndCommas(
+        String(validationObject.monto_total)
+    ); //valida solo numeros y comas
     if (onlyNumbers && atLeastOneCharacter) {
         return true;
     } else return false;
@@ -239,11 +250,24 @@ const validateFormProveedores = (item) => {
         return x.length == 0;
     };
     const atLeastOneCharacter = !Object.values(validationObject).some(notEmpty); //valida completitud
-    const onlyNumbers = validateNumbersAndCommas([
+    const onlyNumbersMonto_total = validateNumbersAndCommas(
+        String(item.monto_total)
+    );
+    const onlyNumbersRetencion = validateNumbersAndCommas(
+        String(item.retencion_islr)
+    );
+    /*     const onlyNumbers = validateNumbersAndCommas([
         String(item.monto_total),
         String(item.retencion_islr),
-    ]); 
-    if (onlyNumbers && atLeastOneCharacter && item.monto_total >= item.retencion_islr ) {
+    ]); */
+    console.log(onlyNumbersMonto_total, onlyNumbersRetencion, typeof(onlyNumbersMonto_total), typeof(onlyNumbersRetencion))
+    if (
+        //onlyNumbers &&
+        onlyNumbersMonto_total &&
+        onlyNumbersRetencion &&
+        atLeastOneCharacter &&
+        item.monto_total > item.retencion_islr
+    ) {
         return true;
     } else return false;
 };

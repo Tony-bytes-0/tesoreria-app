@@ -88,8 +88,7 @@ const totalize = (key) => {
 const addToList = (newItem) => {
     if (selectedAccount.value.codigo_cuenta.length < 1 && validateForm.value) {
         staticError("Seleccione una cuenta bancaria");
-    } 
-    else {
+    } else {
         newItem = {
             ...newItem,
             id: idCounter.value++,
@@ -126,10 +125,16 @@ const resetForm = () => {
 
 const accProps = (item) => {
     return {
-        title: item.banco_nombre + '  -  ' + item.codigo_cuenta + '  ' + item.moneda_id, // + " - " + item.codigo_cuenta,
+        title:
+            item.banco_nombre +
+            "  -  " +
+            item.codigo_cuenta +
+            "  " +
+            item.moneda_id, // + " - " + item.codigo_cuenta,
         subtitle:
-            item.moneda_id == 'VED' ? 'Bs. ' + item.codigo_cuenta :
-            '$' + " - " + item.codigo_cuenta, 
+            item.moneda_id == "VED"
+                ? "Bs. " + item.codigo_cuenta
+                : "$" + " - " + item.codigo_cuenta,
         value: {
             id: item.id,
             banco_id: item.banco_id,
@@ -241,7 +246,7 @@ const submit = async () => {
                 ></v-col
             >
 
-            <v-col md="2" align-self="center">
+            <!--             <v-col md="2" align-self="center">
                 <v-container>
                     <v-switch
                         v-model="validateForm"
@@ -251,7 +256,7 @@ const submit = async () => {
             </v-col>
             <v-col md="1" align-self="center">{{
                 validateForm ? "validar" : "NO validar"
-            }}</v-col>
+            }}</v-col> -->
         </v-row>
 
         <v-divider :thickness="7">Datos de la Cuenta</v-divider>
@@ -279,39 +284,33 @@ const submit = async () => {
                 </v-container>
             </v-row>
             <v-col cols="2">
-                <v-col cols="12" class="text-center p-2">
+                <div class="flex flex-column items-center">
                     <v-btn
                         @click="selectAccGroup('naviarca')"
                         :class="{ selected: company == 'naviarca' }"
+                        class="flex w-100 text-center justify-center p-2"
                         :disabled="items.length > 0"
                     >
                         Naviarca
                     </v-btn>
-                </v-col>
-                <v-col cols="12" class="text-center p-2">
-                    <v-btn
-                        @click="selectAccGroup('grancacique')"
-                        :class="{ selected: company == 'grancacique' }"
-                        :disabled="items.length > 0"
-                        >Gran cacique</v-btn
-                    >
-                </v-col>
-                <v-col cols="12" class="text-center p-2">
-                    <v-btn
-                        @click="selectAccGroup('serviencomiendas')"
-                        block
-                        outline
-                        class="w-full"
-                        :class="{ selected: company == 'serviencomiendas' }"
-                        :disabled="items.length > 0"
-                        ><span
-                            class="text-wrap"
-                            style="width: min-content; margin: auto"
+                        <v-btn
+                            @click="selectAccGroup('grancacique')"
+                            :class="{ selected: company == 'grancacique' }"
+                            class="flex w-100 text-center justify-center p-2"
+                            :disabled="items.length > 0"
+                            >Gran cacique</v-btn
                         >
-                            serviencomiendas</span
-                        ></v-btn
-                    >
-                </v-col>
+                        <v-btn
+                            @click="selectAccGroup('serviencomiendas')"
+                            block
+                            outline
+                            class="flex w-100 text-center justify-center p-2"
+                            :class="{ selected: company == 'serviencomiendas' }"
+                            :disabled="items.length > 0"
+                        >
+                            serviencomiendas</v-btn
+                        >
+                </div>
             </v-col>
             <v-row>
                 <v-col cols="12" align-self="end">
@@ -324,7 +323,7 @@ const submit = async () => {
                     ></v-select>
                 </v-col>
                 <v-col cols="6" class="align-bottom justify-end mt-5">
-                    <h1 class = 'p-2'>Tipo de orden</h1>
+                    <h1 class="p-2">Tipo de orden</h1>
                     <v-select
                         v-model="properties.tipo"
                         :items="['Proveedores', 'Electronico']"
@@ -344,7 +343,7 @@ const submit = async () => {
                 </v-col>
             </v-row>
             <v-col cols="12">
-                <h1 class = 'p-2'>Concepto</h1>
+                <h1 class="p-2">Concepto</h1>
                 <v-text-field
                     class="custom-dark"
                     v-model="properties.concepto"
@@ -408,7 +407,6 @@ const submit = async () => {
                         :numero_personas="computedTotals.numero_personas"
                         v-if="properties.tipo == 'Electronico'"
                     />
-
                 </tr>
             </tbody>
         </v-table>

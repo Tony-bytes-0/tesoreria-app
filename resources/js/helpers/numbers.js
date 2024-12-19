@@ -26,13 +26,7 @@ export const totalize = (key) => {
     return total;
 };
 
-export function validateNumbersAndCommas(array) {
-    return array.every((item) => {
-        if (Array.isArray(item)) {
-            return item.every((subItem) => /^[0-9.]+$/.test(subItem));
-        } else if (typeof item === "string") {
-            return /^[0-9.]+$/.test(item);
-        }
-        return false;
-    });
+export function validateNumbersAndCommas(input) {
+    const regex = /^[0-9,]+$/;
+    return regex.test(input);
 }
