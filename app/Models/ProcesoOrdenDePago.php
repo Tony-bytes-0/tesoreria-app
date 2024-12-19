@@ -14,7 +14,10 @@ class ProcesoOrdenDePago extends Model
         'transferencia',
         'comision_bancaria',
         'retencion_islr',
-        'rif'
+        'rif',
+        'cuenta_bancaria_id',
+
+        'tasa', 'fecha', 'tipo',
 
     ];
     public function proceso_id()

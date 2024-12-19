@@ -58,54 +58,67 @@ class OrdenDePagoController extends Controller
 
 
         $transactionResult = DB::transaction(function () use ($validatedData) {
-            
-            $totalTransferencia = 0;
-            $totalMontoTotal = 0;
-            $totalRetencionISLR = 0;
-            $totalComisionBancaria = 0;
+
+            $totalValues = [
+                'transferencia' => 0,
+                'monto_total' => 0,
+                'retencion_islr' => 0,
+                'comision_bancaria' => 0
+            ];
 
             foreach ($validatedData['items'] as $value) {
                 if (isset($value['transferencia']) && is_numeric($value['transferencia'])) {
-                    $totalTransferencia += (float)$value['transferencia'];
+                    $totalValues['transferencia'] += (float)$value['transferencia'];
                 }
                 if (isset($value['monto_total']) && is_numeric($value['monto_total'])) {
-                    $totalMontoTotal += (float)$value['monto_total'];
+                    $totalValues['monto_total'] += (float)$value['monto_total'];
                 }
                 if (isset($value['retencion_islr']) && is_numeric($value['retencion_islr'])) {
-                    $totalRetencionISLR += (float)$value['retencion_islr'];
+                    $totalValues['retencion_islr'] += (float)$value['retencion_islr'];
                 }
                 if (isset($value['comision_bancaria']) && is_numeric($value['comision_bancaria'])) {
-                    $totalComisionBancaria += (float)$value['comision_bancaria'];
+                    $totalValues['comision_bancaria'] += (float)$value['comision_bancaria'];
                 }
             }
+            //proceso de pago con el mismo rif y cuenta bancaria, obtener numero de proceso.secuencia
+            //Ultimo numero de secuencia, comparar rif y cuenta_bancaria = request
+            $procesoLastEntry = ProcesoOrdenDePago::where('rif', '=', $validatedData['properties']['rif'])
+                ->where('cuenta_bancaria_id', '=', $validatedData['properties']['cuenta_bancaria_id'])
+                ->where('tipo', '=', $validatedData['properties']['tipo'])
+                ->whereNotNull('secuencia')
+                ->orderBy('secuencia', 'desc')->limit(1)
+                ->get();
+            $secuencia = ($procesoLastEntry->first() ?? null)->secuencia ?? 1;
+            $lastProcesoId = $procesoLastEntry->first()->id ?? 1;
+            //obtener el numero de secuencia de las ordenes de pago asociadas al ultimo proceso de pago, ordenados por orden.secuencia
+            //Ultimo numero de secuencia de la orden de pago presente en el ultimo proceso orden de pagos.
+            $ordenLastEntry = OrdenDePagoElectronico::where('proceso_id', '=', $lastProcesoId)
+                ->whereNotNull('secuencia')
+                ->orderBy('secuencia', 'desc')->limit(1);
+            $lastOrdenSecuencia = ($ordenLastEntry->first() ?? null)->secuencia ?? 1;
+            $procesoOrdenesArrayData = array_merge($totalValues, $validatedData['properties']);
+            $procesoOrdenesArrayData['secuencia'] = $secuencia + 1;
+            $procesoOrdenes = ProcesoOrdenDePago::create($procesoOrdenesArrayData);
 
-            $procesoOrdenes = ProcesoOrdenDePago::create([
-                'rif' => $validatedData['properties']['rif'],
-                'transferencia' => $totalTransferencia, 
-                'monto_total' => $totalMontoTotal,
-                'retencion_islr' => $totalRetencionISLR,
-                'comision_bancaria' => $totalComisionBancaria,
-                'concepto' => $validatedData['properties']['concepto'], 
-                'secuencia' => '1'
-            ]);
-
-            $ordenDePagos = collect($validatedData["items"])->map(function ($item) use ($procesoOrdenes, $validatedData) {
-                $item['proceso_id'] = $procesoOrdenes['id'];
-                $item['secuencia'] = '1';
-                unset($validatedData['properties']['concepto']); //elimino el concepto, se repite en items y properties
-                unset($validatedData['properties']['cuenta_bancaria_id']); //se repite en items y properties
-
-                return OrdenDePagoElectronico::create(array_merge($item, $validatedData['properties']));
-            });
-
-            return ['orden_de_pagos' => $ordenDePagos, 'proceso_ordenes' => $procesoOrdenes];
+            $ordenDePagos = collect($validatedData["items"])
+                ->map(function ($item) use ($procesoOrdenes, $lastOrdenSecuencia, &$counter) {
+                    $counter++;
+                    $item['proceso_id'] = $procesoOrdenes['id'];
+                    $item['secuencia'] = $lastOrdenSecuencia + $counter;
+                    return OrdenDePagoElectronico::create($item);
+                })
+                ->all();
+            return ['ordenes' => $ordenDePagos, 'proceso' => $procesoOrdenes];
         });
 
         return response()->json([
-            'message' => 'Ordenes de pago electrónicas registradas exitosamente.',
-            'num_records_saved' => count($transactionResult['orden_de_pagos']),
-            'saved_records' => $transactionResult['orden_de_pagos'],
-            'numero_orden_de_pago' => $transactionResult['proceso_ordenes']['id']
+            'message' => 'Ordenes de pago electrónicos registradas exitosamente.',
+            'registros_guardados' => count($transactionResult['ordenes']),
+            'ordenes' => $transactionResult['ordenes'],
+            'proceso' => $transactionResult['proceso'],
+            'primera_orden' => reset($transactionResult['ordenes'])['secuencia'],
+            'ultima_orden' => $transactionResult['ordenes'][array_key_last($transactionResult['ordenes'])]['secuencia'],
+            //'orden_secuencia' => $transactionResult['orden_de_pagos']['secuencia'],
         ], 201);
     }
 
@@ -123,7 +136,6 @@ class OrdenDePagoController extends Controller
         //dd($updatedValues);
         return response()->json([
             'message' => 'mensaje estatic',
-
         ], 201);
     }
 }

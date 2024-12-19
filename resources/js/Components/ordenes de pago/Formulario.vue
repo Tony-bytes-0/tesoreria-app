@@ -3,16 +3,26 @@
     <v-divider :thickness="7">Datos de la orden de pago</v-divider>
     <v-form class="p-2" @submit.prevent>
         <v-row align="center">
-            <v-col cols="2"><SvgIcon type="mdi" :path="successIconPath" size="50" v-if="!validateForm(ordenDePagoElectronico)"></SvgIcon></v-col>
+            <v-col cols="2"
+                ><SvgIcon
+                    type="mdi"
+                    :path="successIconPath"
+                    size="50"
+                    v-if="
+                        validateFormelectronico(formData) &&
+                        props.pagoElectronico
+                    "
+                ></SvgIcon
+            ></v-col>
             <v-col cols="4">
+                <h1 class="p-2">Beneficiario</h1>
                 <v-autocomplete
-                    label="Beneficiario"
-                    v-model="ordenDePagoElectronico.beneficiario"
+                    v-model="formData.beneficiario"
                     item-title="descripcion"
                     item-value="descripcion"
                     :items="props.beneficiarios"
                     return-object
-                    :disabled="!props.showForm && props.validateForm"
+                    :disabled="!props.showForm"
                 >
                     <template v-slot:item="{ props, item }">
                         <v-list-item
@@ -30,20 +40,30 @@
             </v-col>
 
             <v-col cols="2">
+                <h1 class="p-2">
+                    {{
+                        !props.pagoElectronico
+                            ? "Número de factura"
+                            : "Numero de personas"
+                    }}
+                </h1>
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.factura"
-                    :label="!props.pagoElectronico ? 'Número de factura' : 'Numero de personas'"
-                    :disabled="!props.showForm && props.validateForm"
+                    v-model="formData.factura"
+                    :disabled="!props.showForm"
                 ></v-text-field>
             </v-col>
 
             <v-col cols="2">
+                <h1 class="p-2">
+                    {{
+                        props.pagoElectronico ? "Total a pagar" : "Monto total"
+                    }}
+                </h1>
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.monto_total"
-                    :label="props.pagoElectronico ? 'Total a pagar' : 'Monto total'"
-                    :disabled="!props.showForm && props.validateForm"
+                    v-model="formData.monto_total"
+                    :disabled="!props.showForm"
                 ></v-text-field>
             </v-col>
             <v-col cols="1"></v-col>
@@ -51,25 +71,26 @@
         <v-row>
             <v-col cols="2"></v-col>
             <v-col cols="2">
+                <h1 class="p-2">Monto retención ISLR</h1>
                 <v-text-field
                     v-if="!props.pagoElectronico"
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.retencion_islr"
-                    label="Monto retención ISLR"
-                    :disabled="!props.showForm && props.validateForm"
+                    v-model="formData.retencion_islr"
+                    :disabled="!props.showForm"
                 ></v-text-field>
             </v-col>
+            <v-col cols="2">
+                <h1 class="p-2">Nº Autorización</h1>
 
-            <v-col cols="2">
                 <v-text-field
-                v-if="!props.pagoElectronico"
+                    v-if="!props.pagoElectronico"
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.autorizacion"
-                    label="Nº Autorización"
-                    :disabled="!props.showForm && props.validateForm"
+                    v-model="formData.autorizacion"
+                    :disabled="!props.showForm"
                 ></v-text-field>
             </v-col>
             <v-col cols="2">
+                <h1 class="p-2">Monto transferencia</h1>
                 <v-text-field
                     v-if="!props.pagoElectronico"
                     class="custom-dark custom-input"
@@ -79,6 +100,7 @@
                 ></v-text-field>
             </v-col>
             <v-col cols="2">
+                <h1 class="p-2">Comisión bancaria</h1>
                 <v-text-field
                     v-if="!props.pagoElectronico"
                     class="custom-dark"
@@ -89,22 +111,22 @@
             </v-col>
             <v-col cols="2"></v-col>
         </v-row>
-         <v-row>
+        <v-row>
             <v-col cols="12">
+                <h1 class="p-2">Concepto</h1>
                 <v-text-field
                     class="custom-dark"
-                    v-model="ordenDePagoElectronico.concepto"
-                    label="Concepto ( opcional )"
+                    v-model="formData.concepto"
                 ></v-text-field>
             </v-col>
         </v-row>
-        
+
         <v-row>
             <v-col
                 cols="12"
                 class="justify-center items-center p-6 mx-auto flex"
             >
-                <!-- <v-btn @click="() => console.log(ordenDePagoElectronico)"> -->
+                <!-- <v-btn @click="() => console.log(formData)"> -->
                 <v-btn
                     class="w-2/5 justify-center items-center m-2"
                     color="primary"
@@ -123,22 +145,27 @@
                 </v-btn>
             </v-col>
         </v-row>
-
-        
     </v-form>
 </template>
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { staticError } from "../alerts/staticMessages";
-import SvgIcon from '@jamescoyle/vue-icon';
-import { mdiCheckBold } from '@mdi/js';
+import SvgIcon from "@jamescoyle/vue-icon";
+import { mdiCheckBold } from "@mdi/js";
 import "vuetify/styles";
 import "vuetify";
+import { validateNumbersAndCommas } from "@/helpers/numbers";
 
-const successIconPath = mdiCheckBold
+const successIconPath = mdiCheckBold;
 const emit = defineEmits(["addToList", "submit"]);
-const props = defineProps(["validateForm", "beneficiarios", "showForm", "pagoElectronico", "canSubmit"]);
-var ordenDePagoElectronico = ref({
+const props = defineProps([
+    "validateForm",
+    "beneficiarios",
+    "showForm",
+    "pagoElectronico",
+    "canSubmit",
+]);
+var formData = ref({
     //fecha: "", datos ahora fuera del formulario
     //tipo: "",
     //referencia: "",
@@ -152,27 +179,25 @@ var ordenDePagoElectronico = ref({
 });
 
 const beneficiario_id = computed(() => {
-    return ordenDePagoElectronico.value.beneficiario.id
-})
+    return formData.value.beneficiario.id;
+});
 
 const transferencia = computed(() => {
     const newValue = parseFloat(
-        ordenDePagoElectronico.value.monto_total - ordenDePagoElectronico.value.retencion_islr
+        formData.value.monto_total - formData.value.retencion_islr
     );
     return Number(newValue.toFixed(2));
 });
 
 const comision_bancaria = computed(() => {
-        const newValue = parseFloat(
-        0.0025 * transferencia.value.toString()
-    );    
+    const newValue = parseFloat(0.0025 * transferencia.value.toString());
     return Number(newValue.toFixed(2));
 });
 
-const validateForm = (item) => {
+const validateFormelectronico = (item) => {
     var validationObject = Object.assign({}, item);
-    delete validationObject.concepto; //propiedad no validable
-    delete validationObject.retencion_islr; //propiedad no validable
+    delete validationObject.concepto;
+    delete validationObject.retencion_islr;
     delete validationObject.transferencia;
     delete validationObject.autorizacion;
     delete validationObject.comision_bancaria;
@@ -181,12 +206,50 @@ const validateForm = (item) => {
     const notEmpty = (x) => {
         return x.length == 0;
     };
-    console.log('frenar el paso: ', Object.values(validationObject).some(notEmpty))
-    return Object.values(validationObject).some(notEmpty);
+    const atLeastOneCharacter = !Object.values(validationObject).some(notEmpty); //valida completitud
+    const onlyNumbers = validateNumbersAndCommas([
+        String(validationObject.monto_total),
+    ]); //valida solo numeros y comas
+    console.log(
+        "completitud: ",
+        atLeastOneCharacter,
+        " numeros: ",
+        onlyNumbers,
+        "prueba: "
+    );
+    if (onlyNumbers && atLeastOneCharacter) {
+        return true;
+    } else return false;
+};
+
+const validateFormProveedores = (item) => {
+    var validationObject = Object.assign({}, item);
+    delete validationObject.concepto;
+    delete validationObject.retencion_islr;
+    delete validationObject.comision_bancaria;
+
+    const notEmpty = (x) => {
+        return x.length == 0;
+    };
+    const atLeastOneCharacter = !Object.values(validationObject).some(notEmpty); //valida completitud
+    const onlyNumbers = validateNumbersAndCommas([
+        String(item.monto_total),
+        String(item.retencion_islr),
+    ]); //valida solo numeros y comas
+    console.log(
+        "completitud: ",
+        atLeastOneCharacter,
+        " numeros: ",
+        onlyNumbers,
+        "prueba: "
+    );
+    if (onlyNumbers && atLeastOneCharacter) {
+        return true;
+    } else return false;
 };
 
 const resetForm = () => {
-    ordenDePagoElectronico.value = {
+    formData.value = {
         beneficiario: "",
         factura: "",
         monto_total: "",
@@ -197,27 +260,30 @@ const resetForm = () => {
     };
 };
 const handleAddToList = () => {
-    console.log('formulario: ', ordenDePagoElectronico.value)
-    if (validateForm(ordenDePagoElectronico.value) && props.validateForm) {
-        staticError("Complete el formulario");
-    } else {
+    console.log("formulario: ", props.pagoElectronico && validateFormelectronico(formData.value),
+        !props.pagoElectronico && validateFormProveedores(formData.value))
+    if (
+        (props.pagoElectronico && validateFormelectronico(formData.value)) ||
+        (!props.pagoElectronico && validateFormProveedores(formData.value))
+    ) {
         emit("addToList", {
-            ...ordenDePagoElectronico.value,
-            monto_total: Number(ordenDePagoElectronico.value.monto_total).toFixed(2),
+            ...formData.value,
+            monto_total: Number(formData.value.monto_total).toFixed(2),
             transferencia: transferencia.value,
             comision_bancaria: comision_bancaria.value,
             beneficiario_id: beneficiario_id.value,
-            numero_personas: ordenDePagoElectronico.value.factura
+            numero_personas: formData.value.factura,
         });
         resetForm();
+    } else {
+        staticError("Complete el formulario");
     }
 };
 
 const submit = () => {
-    console.log("formualario: ", ordenDePagoElectronico.value);
-    emit("submit", { ...ordenDePagoElectronico.value });
+    console.log("formualario: ", formData.value);
+    emit("submit", { ...formData.value });
 };
-
 </script>
 
 <style scooped>

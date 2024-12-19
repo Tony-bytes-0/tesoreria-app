@@ -2,7 +2,7 @@
 import { staticError, staticSucces } from "@/Components/alerts/staticMessages";
 import Formulario from "@/Components/ordenes de pago/Formulario.vue";
 import ComputedTotalsProveedores from "@/Components/ordenes de pago/ComputedTotalsProveedores.vue";
-import { formatedNumber } from "@/helpers/numbers";
+import { formatedNumber, validateNumbersAndCommas } from "@/helpers/numbers";
 import Navbar from "@/Layouts/Navbar.vue";
 import axios from "axios";
 import { ref, defineProps, computed } from "vue";
@@ -44,7 +44,7 @@ var properties = ref({
 });
 
 var selectedAccount = ref({
-    id:"",
+    id: "",
     banco_id: "",
     codigo_cuenta: "",
     moneda_id: "",
@@ -88,7 +88,8 @@ const totalize = (key) => {
 const addToList = (newItem) => {
     if (selectedAccount.value.codigo_cuenta.length < 1 && validateForm.value) {
         staticError("Seleccione una cuenta bancaria");
-    } else {
+    } 
+    else {
         newItem = {
             ...newItem,
             id: idCounter.value++,
@@ -102,7 +103,7 @@ const deleteItem = (targetId) => {
 
 const resetAccount = () => {
     selectedAccount.value = {
-        id:"",
+        id: "",
         banco_id: "",
         codigo_cuenta: "",
         moneda_id: "",
@@ -125,13 +126,10 @@ const resetForm = () => {
 
 const accProps = (item) => {
     return {
-        title: item.banco_nombre, // + " - " + item.codigo_cuenta,
+        title: item.banco_nombre + '  -  ' + item.codigo_cuenta + '  ' + item.moneda_id, // + " - " + item.codigo_cuenta,
         subtitle:
-            item.banco_id +
-            " - " +
-/*             item.tipo_cuenta +
-            " - " + */
-            item.codigo_cuenta,
+            item.moneda_id == 'VED' ? 'Bs. ' + item.codigo_cuenta :
+            '$' + " - " + item.codigo_cuenta, 
         value: {
             id: item.id,
             banco_id: item.banco_id,
@@ -171,12 +169,17 @@ const submit = async () => {
         const response = await axios
             .post("/api/registrar_orden_de_pago", {
                 items: items.value,
-                properties: { ...properties.value, cuenta_bancaria_id: selectedAccount.value.id },
+                properties: {
+                    ...properties.value,
+                    cuenta_bancaria_id: selectedAccount.value.id,
+                },
             })
             .then((response) => {
                 staticSucces(
-                    "Guardado con éxito, Numero de orden: " +
-                        response.data.numero_orden_de_pago
+                    `Guardado con éxito, proceso orden de pago numero: 
+                    ${response.data.proceso.secuencia} \n.
+                    ordenes de pago desde Nº: ${response.data.primera_orden}
+                    hasta Nº${response.data.ultima_orden}`
                 );
                 items.value = [];
                 resetForm();
@@ -253,17 +256,17 @@ const submit = async () => {
 
         <v-divider :thickness="7">Datos de la Cuenta</v-divider>
         <v-row>
-            <v-col cols="2"><SvgIcon
-            type="mdi"
-            :path="successIconPath"
-            size="50"
-            v-if="showForm"
-        ></SvgIcon>
-</v-col>
+            <v-col cols="2"
+                ><SvgIcon
+                    type="mdi"
+                    :path="successIconPath"
+                    size="50"
+                    v-if="showForm"
+                ></SvgIcon>
+            </v-col>
             <v-col cols="10"></v-col>
-
         </v-row>
-        
+
         <v-row class="m-2">
             <v-row align-content="center">
                 <v-container fluid>
@@ -312,25 +315,25 @@ const submit = async () => {
             </v-col>
             <v-row>
                 <v-col cols="12" align-self="end">
+                    <h1 class="p-2">Cuenta bancaria</h1>
                     <v-select
                         v-model="selectedAccount"
                         :items="cuentasDisponibles"
                         :item-props="accProps"
-                        label="Cuenta bancaria"
                         :disabled="items.length > 0"
                     ></v-select>
                 </v-col>
                 <v-col cols="6" class="align-bottom justify-end mt-5">
+                    <h1 class = 'p-2'>Tipo de orden</h1>
                     <v-select
                         v-model="properties.tipo"
                         :items="['Proveedores', 'Electronico']"
-                        label="Tipo de orden"
                         :disabled="items.length > 0"
                     >
                     </v-select>
                 </v-col>
 
-                <v-col cols="6" class="">
+                <v-col cols="6" class="align-bottom justify-end mt-10">
                     fecha valor
                     <input
                         type="date"
@@ -341,9 +344,9 @@ const submit = async () => {
                 </v-col>
             </v-row>
             <v-col cols="12">
+                <h1 class = 'p-2'>Concepto</h1>
                 <v-text-field
                     class="custom-dark"
-                    label="Concepto ( opcional )"
                     v-model="properties.concepto"
                     :disabled="items.length > 0"
                 ></v-text-field>
