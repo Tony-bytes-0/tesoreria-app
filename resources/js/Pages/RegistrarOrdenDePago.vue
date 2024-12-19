@@ -408,27 +408,7 @@ const submit = async () => {
                         :numero_personas="computedTotals.numero_personas"
                         v-if="properties.tipo == 'Electronico'"
                     />
-                    <!--                     <div v-if="properties.tipo == 'Proveedores'">
-                        <td class="text-center"><b>totales:</b></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center">
-                            {{ formatedNumber(computedTotals.montoTotal) }}
-                        </td>
-                        <td class="text-center">
-                            {{ formatedNumber(computedTotals.comisionISLR) }}
-                        </td>
-                        <td class="text-center">
-                            {{ formatedNumber(computedTotals.transferencia) }}
-                        </td>
-                        <td class="text-center">
-                            {{
-                                formatedNumber(computedTotals.comisionBancaria)
-                            }}
-                        </td>
-                    </div> -->
+
                 </tr>
             </tbody>
         </v-table>

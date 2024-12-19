@@ -29,9 +29,9 @@ export const totalize = (key) => {
 export function validateNumbersAndCommas(array) {
     return array.every((item) => {
         if (Array.isArray(item)) {
-            return item.every((subItem) => /^[0-9,]+$/.test(subItem));
+            return item.every((subItem) => /^[0-9.]+$/.test(subItem));
         } else if (typeof item === "string") {
-            return /^[0-9,]+$/.test(item);
+            return /^[0-9.]+$/.test(item);
         }
         return false;
     });

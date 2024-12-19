@@ -71,7 +71,9 @@
         <v-row>
             <v-col cols="2"></v-col>
             <v-col cols="2">
-                <h1 class="p-2">Monto retención ISLR</h1>
+                <h1 class="p-2" v-if="!props.pagoElectronico">
+                    Monto retención ISLR
+                </h1>
                 <v-text-field
                     v-if="!props.pagoElectronico"
                     class="custom-dark"
@@ -80,7 +82,9 @@
                 ></v-text-field>
             </v-col>
             <v-col cols="2">
-                <h1 class="p-2">Nº Autorización</h1>
+                <h1 class="p-2" v-if="!props.pagoElectronico">
+                    Nº Autorización
+                </h1>
 
                 <v-text-field
                     v-if="!props.pagoElectronico"
@@ -90,22 +94,24 @@
                 ></v-text-field>
             </v-col>
             <v-col cols="2">
-                <h1 class="p-2">Monto transferencia</h1>
+                <h1 class="p-2" v-if="!props.pagoElectronico">
+                    Monto transferencia
+                </h1>
                 <v-text-field
                     v-if="!props.pagoElectronico"
                     class="custom-dark custom-input"
-                    v-model="transferencia"
-                    label="Monto transferencia"
+                    v-model="formatedTransferencia"
                     disabled
                 ></v-text-field>
             </v-col>
             <v-col cols="2">
-                <h1 class="p-2">Comisión bancaria</h1>
+                <h1 class="p-2" v-if="!props.pagoElectronico">
+                    Comisión bancaria
+                </h1>
                 <v-text-field
                     v-if="!props.pagoElectronico"
                     class="custom-dark"
-                    v-model="comision_bancaria"
-                    label="Comision bancaria"
+                    v-model="formatedComisionBancaria"
                     disabled
                 ></v-text-field>
             </v-col>
@@ -154,7 +160,7 @@ import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiCheckBold } from "@mdi/js";
 import "vuetify/styles";
 import "vuetify";
-import { validateNumbersAndCommas } from "@/helpers/numbers";
+import { formatedNumber, validateNumbersAndCommas } from "@/helpers/numbers";
 
 const successIconPath = mdiCheckBold;
 const emit = defineEmits(["addToList", "submit"]);
@@ -193,6 +199,14 @@ const comision_bancaria = computed(() => {
     const newValue = parseFloat(0.0025 * transferencia.value.toString());
     return Number(newValue.toFixed(2));
 });
+//para la vista
+const formatedTransferencia = computed(() => {
+    return formatedNumber(transferencia.value);
+});
+
+const formatedComisionBancaria = computed(() => {
+    return formatedNumber(comision_bancaria.value);
+});
 
 const validateFormelectronico = (item) => {
     var validationObject = Object.assign({}, item);
@@ -210,13 +224,6 @@ const validateFormelectronico = (item) => {
     const onlyNumbers = validateNumbersAndCommas([
         String(validationObject.monto_total),
     ]); //valida solo numeros y comas
-    console.log(
-        "completitud: ",
-        atLeastOneCharacter,
-        " numeros: ",
-        onlyNumbers,
-        "prueba: "
-    );
     if (onlyNumbers && atLeastOneCharacter) {
         return true;
     } else return false;
@@ -235,15 +242,8 @@ const validateFormProveedores = (item) => {
     const onlyNumbers = validateNumbersAndCommas([
         String(item.monto_total),
         String(item.retencion_islr),
-    ]); //valida solo numeros y comas
-    console.log(
-        "completitud: ",
-        atLeastOneCharacter,
-        " numeros: ",
-        onlyNumbers,
-        "prueba: "
-    );
-    if (onlyNumbers && atLeastOneCharacter) {
+    ]); 
+    if (onlyNumbers && atLeastOneCharacter && item.monto_total >= item.retencion_islr ) {
         return true;
     } else return false;
 };
@@ -260,8 +260,6 @@ const resetForm = () => {
     };
 };
 const handleAddToList = () => {
-    console.log("formulario: ", props.pagoElectronico && validateFormelectronico(formData.value),
-        !props.pagoElectronico && validateFormProveedores(formData.value))
     if (
         (props.pagoElectronico && validateFormelectronico(formData.value)) ||
         (!props.pagoElectronico && validateFormProveedores(formData.value))
@@ -281,7 +279,6 @@ const handleAddToList = () => {
 };
 
 const submit = () => {
-    console.log("formualario: ", formData.value);
     emit("submit", { ...formData.value });
 };
 </script>
