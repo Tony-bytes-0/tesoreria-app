@@ -203,12 +203,12 @@ const transferencia = computed(() => {
     const newValue = parseFloat(
         formData.value.monto_total - formData.value.retencion_islr
     );
-    return Number(newValue.toFixed(2));
+    return Number(newValue);
 });
 
 const comision_bancaria = computed(() => {
     const newValue = parseFloat(0.0025 * transferencia.value.toString());
-    return Number(newValue.toFixed(2));
+    return Number(newValue);
 });
 //para la vista
 const formatedTransferencia = computed(() => {
@@ -260,7 +260,7 @@ const validateFormProveedores = (item) => {
         String(item.monto_total),
         String(item.retencion_islr),
     ]); */
-    console.log(onlyNumbersMonto_total, onlyNumbersRetencion, typeof(onlyNumbersMonto_total), typeof(onlyNumbersRetencion))
+    console.log(onlyNumbersMonto_total, onlyNumbersRetencion)
     if (
         //onlyNumbers &&
         onlyNumbersMonto_total &&
