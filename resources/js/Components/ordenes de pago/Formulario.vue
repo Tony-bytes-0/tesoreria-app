@@ -225,7 +225,7 @@ const onlyNumbersRetencion = computed(() => {
     const regex = /^[0-9,]+$/;
     return regex.test(formData.value.retencion_islr);
 });
-
+//
 const validateFormelectronico = (item) => {
     var validationObject = Object.assign({}, item);
     delete validationObject.concepto;
