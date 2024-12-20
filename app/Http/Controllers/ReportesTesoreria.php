@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CuentasBancaria;
 use App\Models\CuentasContable;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,34 +17,49 @@ class ReportesTesoreria extends Controller
     {
         //$ordenesArray = OrdenDePagoElectronico::get();
         $cuentasContables = CuentasContable::get();
+        $naviarca = CuentasBancaria::where('empresa_id', '=', 'J080056043')->where('activo', '=', true)->get();
+        $grancacique = CuentasBancaria::where('empresa_id', '=', 'J303876056')->where('activo', '=', true)->get();
         return Inertia::render('reportes tesoreria/OrdenesDePago', [
-            'cuentasContables' => $cuentasContables
+            'cuentasContables' => $cuentasContables,
+            'cuentasNaviarca' => $naviarca,
+            'cuentasGc' => $grancacique,
         ]);
     }
 
     public function consultarOrdenesDePago(Request $request)
     {
         $validated = $request->validate([
-            'proceso_id' => 'numeric',
-            'per_page' => 'numeric',
-            'page' => 'numeric',
+            'rif' => 'string|required',
+            'cuenta_bancaria_id' => 'numeric|required',
+            'tipo' => 'string|required',
+            'secuencia' => 'numeric|required',
         ]);
-        $ordenesArray = OrdenDePagoElectronico::with('beneficiario', 'cuenta_contable', 'cuenta_bancaria')->where('proceso_id', '=', $validated['proceso_id'])->orderBy('id')->orderBy('id')->paginate(perPage: $validated['per_page'], page: $validated['page']);
-        $proceso = ProcesoOrdenDePago::find($validated['proceso_id']);
-        if ($ordenesArray->isEmpty()) {
+        $proceso = ProcesoOrdenDePago::where('rif', '=', $validated['rif'])
+        ->where('tipo', '=', $validated['tipo'])
+        ->where('cuenta_bancaria_id', '=', $validated['cuenta_bancaria_id'])
+        ->where('secuencia', '=', $validated['secuencia'])
+        ->orderBy('id', 'desc')
+        ->first();
+        if (!$proceso) {
             return response()->json([
-                'message' => 'No existe el proceso orden de pago numero: ' . $validated['proceso_id'],
-            ], 204);
+                'message' => 'Sin registros',
+                'data' => null,
+            ], 404);
         }
+        $procesoId = $proceso->first()->id ?? 1;
+        $ordenesArray = OrdenDePagoElectronico::with('beneficiario', 'cuenta_contable', 'cuenta_bancaria')
+        ->where('proceso_id','=',$procesoId)->get();
         return response()->json([
-            'items' => $ordenesArray,
-            'proceso_orden_de_pago' => $proceso
+            'proceso' => $proceso,
+            'ordenes' => $ordenesArray,
+            'message' => 'Busqueda exitosa'
         ], 201);
     }
 
     public function consultarUltimasOrdenes(Request $request)
     {
-        $ordenesArray = OrdenDePagoElectronico::with(['beneficiario','cuenta_bancaria','cuenta_contable'])->orderBy('id', 'desc')->paginate(50);
+        
+        $ordenesArray = OrdenDePagoElectronico::with(['beneficiario', 'cuenta_bancaria', 'cuenta_contable'])->orderBy('id', 'desc')->paginate(50);
         return response()->json([
             'items' => $ordenesArray,
         ], 201);

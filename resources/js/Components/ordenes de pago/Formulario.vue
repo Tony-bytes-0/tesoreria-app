@@ -241,6 +241,7 @@ const validateFormelectronico = (item) => {
 };
 
 const validateFormProveedores = (item) => {
+    //console.log('validacion proveedores') // creo que esto jode la validacion
     var validationObject = Object.assign({}, item);
     delete validationObject.concepto;
     delete validationObject.retencion_islr;
@@ -256,13 +257,8 @@ const validateFormProveedores = (item) => {
     const onlyNumbersRetencion = validateNumbersAndCommas(
         String(item.retencion_islr)
     );
-    /*     const onlyNumbers = validateNumbersAndCommas([
-        String(item.monto_total),
-        String(item.retencion_islr),
-    ]); */
-    console.log(onlyNumbersMonto_total, onlyNumbersRetencion)
+    //console.log(onlyNumbersMonto_total, onlyNumbersRetencion) // creo que esto jode la validacion
     if (
-        //onlyNumbers &&
         onlyNumbersMonto_total &&
         onlyNumbersRetencion &&
         atLeastOneCharacter &&

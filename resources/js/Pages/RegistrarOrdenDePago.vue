@@ -283,34 +283,37 @@ const submit = async () => {
                     ></v-img>
                 </v-container>
             </v-row>
-            <v-col cols="2">
-                <div class="flex flex-column items-center">
+            <v-col cols="2" align-self="center">
+                    <v-col align-self="center" >
                     <v-btn
                         @click="selectAccGroup('naviarca')"
                         :class="{ selected: company == 'naviarca' }"
-                        class="flex w-100 text-center justify-center p-2"
+                        class="flex w-100 text-center justify-center p-8"
                         :disabled="items.length > 0"
                     >
                         Naviarca
-                    </v-btn>
+                    </v-btn></v-col>
+                    <v-col >
+
                         <v-btn
                             @click="selectAccGroup('grancacique')"
                             :class="{ selected: company == 'grancacique' }"
-                            class="flex w-100 text-center justify-center p-2"
+                            class="flex w-100 text-center justify-center p-8"
                             :disabled="items.length > 0"
                             >Gran cacique</v-btn
-                        >
+                        ></v-col>
+                    <v-col >
+
                         <v-btn
                             @click="selectAccGroup('serviencomiendas')"
                             block
                             outline
-                            class="flex w-100 text-center justify-center p-2"
+                            class="flex w-100 text-center justify-center p-8"
                             :class="{ selected: company == 'serviencomiendas' }"
                             :disabled="items.length > 0"
                         >
                             serviencomiendas</v-btn
-                        >
-                </div>
+                        ></v-col>
             </v-col>
             <v-row>
                 <v-col cols="12" align-self="end">

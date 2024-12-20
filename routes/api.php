@@ -21,7 +21,7 @@ Route::get('/tasa', [Tasa::class, 'consultar_tasa']);
 Route::get('/consultar_cuentas_contables',  [CuentasContable::class, 'consultar']);
 //reportes
 
-Route::get('/consultar_ordenes_de_pago', [ReportesTesoreria::class, 'consultarOrdenesDePago']);
+Route::post('/consultar_ordenes_de_pago', [ReportesTesoreria::class, 'consultarOrdenesDePago']);
 Route::get('/consultar_ordenes_de_pago_ultimas', [ReportesTesoreria::class, 'consultarUltimasOrdenes']);
 
 //administrar

@@ -22,8 +22,8 @@ class OrdenDePagoController extends Controller
         $tasasInstance = new Tasa;
         $beneficiario_cuentas = Beneficiario_cuentas::all();
         $tasas = $tasasInstance->consultar_tasa();
-        $naviarca = CuentasBancaria::where('empresa_id', '=', 'J080056043')->get();
-        $grancacique = CuentasBancaria::where('empresa_id', '=', 'J303876056')->get();
+        $naviarca = CuentasBancaria::where('empresa_id', '=', 'J080056043')->where('activo', '=', true)->get();
+        $grancacique = CuentasBancaria::where('empresa_id', '=', 'J303876056')->where('activo', '=', true)->get();
 
         return Inertia::render('RegistrarOrdenDePago', [
             'cuentasNaviarca' => $naviarca,
