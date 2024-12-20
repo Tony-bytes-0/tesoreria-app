@@ -183,9 +183,6 @@ const props = defineProps([
     "canSubmit",
 ]);
 var formData = ref({
-    //fecha: "", datos ahora fuera del formulario
-    //tipo: "",
-    //referencia: "",
     beneficiario: "",
     factura: "",
     monto_total: "",
@@ -219,6 +216,16 @@ const formatedComisionBancaria = computed(() => {
     return formatedNumber(comision_bancaria.value);
 });
 
+const onlyNumbersMonto_total = computed(() => {
+    const regex = /^[0-9,]+$/;
+    return regex.test(formData.value.monto_total);
+});
+
+const onlyNumbersRetencion = computed(() => {
+    const regex = /^[0-9,]+$/;
+    return regex.test(formData.value.retencion_islr);
+});
+
 const validateFormelectronico = (item) => {
     var validationObject = Object.assign({}, item);
     delete validationObject.concepto;
@@ -232,10 +239,7 @@ const validateFormelectronico = (item) => {
         return x.length == 0;
     };
     const atLeastOneCharacter = !Object.values(validationObject).some(notEmpty); //valida completitud
-    const onlyNumbers = validateNumbersAndCommas(
-        String(validationObject.monto_total)
-    ); //valida solo numeros y comas
-    if (onlyNumbers && atLeastOneCharacter) {
+    if (onlyNumbersMonto_total && atLeastOneCharacter) {
         return true;
     } else return false;
 };
